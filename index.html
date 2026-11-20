@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Store HQ</title>
+<style>
+:root{
+  --bg:#f5f6f8;--panel:#fff;--ink:#14171c;--mute:#6b7280;--line:#e4e7ec;--soft:#f1f3f6;
+  --acc:#4f46e5;--acc-ink:#fff;--acc-soft:#eef0ff;
+  --good:#047857;--good-soft:#e7f6ef;--bad:#c62828;--bad-soft:#fdecec;--warn:#b45309;--warn-soft:#fdf3e4;
+  --pipe:#d97706;--live:#059669;--stop:#6b7280;--r:10px;
+  --sh:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e1014;--panel:#161920;--ink:#e6e8ec;--mute:#99a1ae;--line:#272c36;--soft:#1d2129;
+  --acc:#8b8ff8;--acc-ink:#0e1014;--acc-soft:#23264a;
+  --good:#34d399;--good-soft:#11291f;--bad:#f87171;--bad-soft:#2d1515;--warn:#fbbf24;--warn-soft:#2b2210;
+  --sh:none;
+}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif}
+a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+h1,h2,h3{margin:0;font-weight:650}
+h3{font-size:15px}
+button{font:inherit;color:inherit;cursor:pointer}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:18px;padding:10px 20px;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{font-weight:750;letter-spacing:-.01em;font-size:16px}
+.brand b{color:var(--acc)}
+nav{display:flex;gap:2px;flex:1;overflow-x:auto}
+nav a{padding:6px 12px;border-radius:8px;color:var(--mute);font-weight:550;white-space:nowrap}
+nav a:hover{background:var(--soft);text-decoration:none;color:var(--ink)}
+nav a.on{background:var(--acc-soft);color:var(--acc)}
+.sync{display:flex;align-items:center;gap:8px}
+#syncStatus{font-size:12.5px;color:var(--mute);white-space:nowrap}
+#syncStatus.dirty{color:var(--warn);font-weight:600}
+#syncStatus.err{color:var(--bad);font-weight:600}
+main{max-width:1320px;margin:0 auto;padding:20px}
+.btn{border:1px solid var(--line);background:var(--panel);padding:7px 13px;border-radius:8px;font-weight:550;white-space:nowrap}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{background:var(--soft)}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:4px 10px;font-size:12.5px}
+.btn:disabled{opacity:.5;cursor:default}
+#saveBtn.pulse{box-shadow:0 0 0 3px var(--acc-soft)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);margin-bottom:16px}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.card h3{margin-bottom:12px}.card-h h3{margin:0}
+.narrow{max-width:760px}
+.hint{color:var(--mute);font-size:12.5px;margin:4px 0 10px}
+.mute{color:var(--mute)}
+.count{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:10px;background:var(--soft);color:var(--mute);font-size:12px;text-align:center;font-weight:600}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.in,select.in,textarea.in{width:100%;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 10px;font:inherit;outline:none;transition:border-color .12s,box-shadow .12s}
+.in:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+textarea.in{resize:vertical;min-height:38px;line-height:1.45}
+.in::placeholder{color:var(--mute);opacity:.75}
+.f{display:block;margin-bottom:10px}
+.f>span{display:block;font-size:12px;font-weight:600;color:var(--mute);margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+.ig{display:flex;align-items:center;gap:6px}
+.ig em{font-style:normal;color:var(--mute);font-size:12px;white-space:nowrap}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.banner{padding:10px 14px;border-radius:var(--r);margin-bottom:16px;border:1px solid var(--line);background:var(--warn-soft);color:var(--ink)}
+.banner.err{background:var(--bad-soft)}
+.empty{padding:28px;text-align:center;color:var(--mute);border:1px dashed var(--line);border-radius:var(--r)}
+.pos{color:var(--good)}.negv{color:var(--bad)}
+/* board */
+.toolbar{display:flex;gap:10px;margin-bottom:16px;align-items:center}
+.toolbar .in{max-width:320px}
+.board{display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:14px;align-items:start}
+.col{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px;min-height:200px;transition:outline-color .1s;outline:2px dashed transparent;outline-offset:-2px}
+.col.over{outline-color:var(--acc)}
+.col-h{display:flex;align-items:center;font-weight:650;padding:4px 6px 10px}
+.dot{width:9px;height:9px;border-radius:50%;margin-right:8px;background:var(--mute)}
+.dot.pipeline{background:var(--pipe)}.dot.live{background:var(--live)}.dot.stopped{background:var(--stop)}
+.col-empty{color:var(--mute);font-size:12.5px;text-align:center;padding:24px 8px}
+.pcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;box-shadow:var(--sh)}
+.pcard:hover{border-color:var(--acc)}
+.pcard.dragging{opacity:.4}
+.pc-top{display:flex;gap:10px;align-items:center}
+.thumb{width:40px;height:40px;border-radius:8px;object-fit:cover;flex:none;background:var(--soft)}
+.thumb.ph{display:grid;place-items:center;font-weight:700;color:var(--mute);text-transform:uppercase}
+.thumb.lg{width:52px;height:52px}
+.pc-name{font-weight:620;line-height:1.25}
+.pc-sub{font-size:12px;color:var(--mute)}
+.pc-stats{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;margin-top:8px}
+.pc-move{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:transparent;border-radius:20px;padding:2px 9px;font-size:11.5px;color:var(--mute)}
+.chip:hover{color:var(--acc);border-color:var(--acc)}
+/* product page */
+.back{display:inline-block;margin-bottom:8px;font-size:13px}
+.ph{margin-bottom:16px}
+.ph-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.title-in{flex:1;min-width:220px;font-size:22px;font-weight:700;border:1px solid transparent;background:transparent;color:var(--ink);padding:4px 8px;border-radius:8px;outline:none}
+.title-in:hover{border-color:var(--line)}.title-in:focus{border-color:var(--acc);background:var(--panel)}
+.meta{color:var(--mute);font-size:12.5px;margin:4px 0 0 8px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;padding:2px;background:var(--soft);gap:2px}
+.seg button,.seg label span{display:block;border:0;background:transparent;padding:5px 12px;border-radius:7px;font-weight:600;color:var(--mute);font-size:13px;cursor:pointer}
+.seg label input{position:absolute;opacity:0;pointer-events:none}
+.seg label input:checked+span,.seg button.on{background:var(--panel);color:var(--ink);box-shadow:var(--sh)}
+.seg button.on.pipeline{color:var(--pipe)}.seg button.on.live{color:var(--live)}.seg button.on.stopped{color:var(--stop)}
+.grid2{display:grid;grid-template-columns:minmax(300px,1fr) minmax(420px,1.7fr);gap:16px;align-items:start}
+.grid2>.card{margin-bottom:0}
+.grid2+.card,.grid2+section{margin-top:16px}
+.pages .pg{display:grid;grid-template-columns:120px 1fr auto auto;gap:6px;margin-bottom:6px}
+.icon-btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;width:32px;height:32px;display:grid;place-items:center;color:var(--mute);flex:none}
+.icon-btn:hover{color:var(--ink);background:var(--soft)}
+.icon-btn.del:hover{color:var(--bad)}
+/* calculator */
+.calc{display:grid;grid-template-columns:minmax(220px,1fr) minmax(260px,1.25fr);gap:18px}
+.calc .seg{margin-bottom:6px;flex-wrap:wrap}
+.calc-in .f{margin-bottom:8px}
+.calc-in .two{gap:8px}
+table{border-collapse:collapse;width:100%}
+.pl th,.pl td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}
+.pl th{font-weight:550;color:var(--mute);text-transform:uppercase;font-size:11.5px;letter-spacing:.03em}
+.pl td{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;white-space:nowrap}
+.pl td.sub{color:var(--mute);font-weight:500;font-size:12px;text-align:left;padding-left:10px}
+.pl tr.cost td:first-of-type{color:var(--bad)}
+.pl tr.em th,.pl tr.em td:first-of-type{color:var(--ink)}
+.np{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:10px 12px;border-radius:9px;background:var(--good-soft)}
+.np.negv{background:var(--bad-soft)}
+.np span{font-weight:650;text-transform:uppercase;font-size:12px;letter-spacing:.04em;color:var(--ink)}
+.np strong{font-size:20px;font-variant-numeric:tabular-nums}
+.np.pos strong{color:var(--good)}.np.negv strong{color:var(--bad)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.kpis div{background:var(--soft);border-radius:8px;padding:7px 9px}
+.kpis span{display:block;font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.03em;font-weight:600}
+.kpis b{font-size:15px;font-variant-numeric:tabular-nums}
+/* angles */
+.angle .angle-h{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.anum{font-weight:750;color:var(--acc);background:var(--acc-soft);border-radius:7px;padding:3px 8px;font-size:12.5px}
+.angle-title{flex:1;min-width:200px;font-weight:650;font-size:15px}
+.angle-h .in{width:auto}
+.angle-h .angle-title{width:auto;flex:1}
+.pill-select{width:auto;border-radius:20px;padding:4px 10px;font-weight:600;font-size:12.5px}
+.st-idea{color:var(--mute)}.st-testing{color:var(--warn)}.st-winning{color:var(--good)}.st-paused{color:var(--mute)}.st-killed{color:var(--bad)}
+.hbc{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.perf{margin-top:4px;border-top:1px solid var(--line);padding-top:8px}
+.perf summary{cursor:pointer;font-weight:600;display:flex;gap:10px;align-items:center;flex-wrap:wrap;list-style:none}
+.perf summary::-webkit-details-marker{display:none}
+.perf summary::before{content:"▸";color:var(--mute);transition:transform .15s}
+.perf[open] summary::before{transform:rotate(90deg)}
+.perf summary .tot{font-weight:500;color:var(--mute);font-size:12.5px}
+.log{margin:10px 0 8px}
+.log th{font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--mute);text-align:left;font-weight:600;padding:0 4px 4px}
+.log td{padding:2px 4px}
+.log .in{padding:5px 8px}
+.data th,.data td{padding:8px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.data th{font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--mute);font-weight:600}
+.data th:first-child,.data td:first-child,.data .l{text-align:left}
+.data tbody tr[data-act]{cursor:pointer}
+.data tbody tr[data-act]:hover{background:var(--soft)}
+.data tfoot td{font-weight:700;border-bottom:0}
+.wrap{overflow-x:auto}
+.bar{display:inline-block;height:6px;border-radius:3px;background:var(--acc);vertical-align:middle;margin-right:6px;opacity:.7}
+.star{color:var(--warn)}
+.tag{display:inline-block;padding:1px 8px;border-radius:12px;font-size:11.5px;font-weight:600;background:var(--soft)}
+/* dashboard */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh)}
+.tile span{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);font-weight:600}
+.tile b{display:block;font-size:22px;margin-top:2px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.tile small{color:var(--mute)}
+.tile.pipeline b{color:var(--pipe)}.tile.live b{color:var(--live)}.tile.stopped b{color:var(--stop)}
+/* modal / toast */
+#modal{position:fixed;inset:0;background:rgba(10,12,16,.45);display:grid;place-items:center;z-index:50;padding:20px}
+#modal[hidden]{display:none}
+.mbox{background:var(--panel);border-radius:12px;padding:20px;max-width:460px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.mbox p{color:var(--mute);margin:8px 0 16px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.t{background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:9px;font-weight:550;box-shadow:0 6px 20px rgba(0,0,0,.2);animation:tin .18s ease-out}
+.t.error{background:var(--bad);color:#fff}
+@keyframes tin{from{opacity:0;transform:translateY(6px)}}
+.loading{padding:60px;text-align:center;color:var(--mute)}
+@media (max-width:1100px){.grid2{grid-template-columns:1fr}}
+@media (max-width:900px){.board{grid-template-columns:1fr}.hbc{grid-template-columns:1fr}.calc{grid-template-columns:1fr}}
+@media (max-width:640px){main{padding:12px}.topbar{flex-wrap:wrap;gap:8px;padding:8px 12px}nav{order:3;flex-basis:100%}#syncStatus{display:none}.kpis{grid-template-columns:1fr 1fr}.pages .pg{grid-template-columns:1fr auto auto}.pages .pg input:first-child{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">Store<b>HQ</b></div>
+  <nav id="nav">
+    <a href="#/" data-nav="dashboard">Dashboard</a>
+    <a href="#/board" data-nav="board">Products</a>
+    <a href="#/calc" data-nav="calc">Calculator</a>
+    <a href="#/settings" data-nav="settings">Settings</a>
+  </nav>
+  <div class="sync">
+    <span id="syncStatus"></span>
+    <button id="reloadBtn" class="btn ghost sm" title="Reload latest from GitHub">↻ Reload</button>
+    <button id="saveBtn" class="btn primary" title="Save (Ctrl/Cmd+S)">Save</button>
+  </div>
+</header>
+<main id="view"><div class="loading">Loading…</div></main>
+<div id="toast"></div>
+<div id="modal" hidden></div>
+
+<script>
+'use strict';
+/* ============================================================
+   Store HQ — static product dashboard, data stored in GitHub.
+   Everything is in this one file. Data lives in a JSON file in
+   a GitHub repo, read/written via the GitHub Contents API.
+   ============================================================ */
+
+const LS_CFG = 'storehq.config.v1';
+const LS_DRAFT = 'storehq.draft.v1';
+const STAGES = [
+  { key: 'pipeline', label: 'Pipeline' },
+  { key: 'live', label: 'Live' },
+  { key: 'stopped', label: 'Stopped' },
+];
+const ANGLE_STATUS = ['Idea', 'Testing', 'Winning', 'Paused', 'Killed'];
+
+const S = { data: null, sha: null, dirty: false, changes: new Set(), saving: false, loadError: '', lastLoad: 0, boardQ: '' };
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+/* ---------------- utils ---------------- */
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const has = v => !(v === null || v === undefined || v === '');
+const num = v => (has(v) && isFinite(Number(v))) ? Number(v) : 0;
+const safeUrl = u => { try { const x = new URL(String(u).trim()); return /^https?:$/.test(x.protocol) ? x.href : ''; } catch { return ''; } };
+function inr(v) {
+  if (v == null || !isFinite(v)) return '—';
+  const r = Math.round(v * 100) / 100;
+  const a = Math.abs(r);
+  const s = (Number.isInteger(r) || a >= 1000)
+    ? Math.round(a).toLocaleString('en-IN')
+    : a.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (r < 0 ? '-' : '') + '₹' + s;
+}
+const n0 = v => (v == null || !isFinite(v)) ? '—' : Math.round(v).toLocaleString('en-IN');
+const pct = (v, d = 2) => (v == null || !isFinite(v)) ? '—' : (v * 100).toFixed(d) + '%';
+const xx = v => (v == null || !isFinite(v)) ? '—' : v.toFixed(2) + 'x';
+
+/* ---------------- data model ---------------- */
+function defaultDefaults() {
+  return { mode: 'aggregator', orders: 1000, cac: null, deliveryPct: 35, rto: 65, shipping: 0, shippingBasis: 'all', packaging: 0 };
+}
+function emptyData() { return { version: 1, settings: { defaults: defaultDefaults() }, products: [], scratch: exampleCalc() }; }
+function calcFrom(d) {
+  return { mode: d.mode, aov: null, orders: d.orders, cac: d.cac, deliveryPct: d.deliveryPct, cogs: null, shipping: d.shipping, shippingBasis: d.shippingBasis, rto: d.rto, packaging: d.packaging };
+}
+function exampleCalc() {
+  return { mode: 'aggregator', aov: 499, orders: 10000, cac: 45, deliveryPct: 35, cogs: 150, shipping: 0, shippingBasis: 'all', rto: 65, packaging: 0 };
+}
+function normalize(d) {
+  if (!d || typeof d !== 'object') d = emptyData();
+  d.version = d.version || 1;
+  d.settings = d.settings || {};
+  d.settings.defaults = Object.assign(defaultDefaults(), d.settings.defaults || {});
+  d.products = Array.isArray(d.products) ? d.products : [];
+  for (const p of d.products) {
+    p.id = p.id || uid();
+    if (!STAGES.some(s => s.key === p.status)) p.status = 'pipeline';
+    p.angles = Array.isArray(p.angles) ? p.angles : [];
+    p.pages = Array.isArray(p.pages) ? p.pages : [];
+    p.calc = Object.assign(calcFrom(d.settings.defaults), p.calc || {});
+    for (const a of p.angles) {
+      a.id = a.id || uid();
+      a.status = a.status || 'Idea';
+      a.log = Array.isArray(a.log) ? a.log : [];
+      for (const l of a.log) l.id = l.id || uid();
+    }
+    for (const pg of p.pages) pg.id = pg.id || uid();
+  }
+  d.scratch = Object.assign(exampleCalc(), d.scratch || {});
+  return d;
+}
+const getP = id => S.data.products.find(p => p.id === id);
+
+/* ---------------- calculator ---------------- */
+function calcModel(c, p) {
+  const aov = has(c.aov) ? num(c.aov) : num(p && p.sellingPrice);
+  const cogsU = has(c.cogs) ? num(c.cogs) : num(p && p.listingPrice);
+  const orders = num(c.orders), cac = num(c.cac);
+  const d = Math.min(Math.max(num(c.deliveryPct), 0), 100) / 100;
+  const self = c.mode === 'self';
+  const shipU = self ? num(c.shipping) : 0;
+  const shipAll = self && c.shippingBasis !== 'delivered';
+  const rtoU = num(c.rto), packU = num(c.packaging);
+
+  const adSpend = orders * cac;
+  const revenue = orders * aov;
+  const delivered = orders * d;
+  const rto = orders - delivered;
+  const deliveredRevenue = delivered * aov;
+  const cogs = delivered * cogsU;
+  const shipping = shipU * (shipAll ? orders : delivered);
+  const rtoCost = rto * rtoU;
+  const packaging = orders * packU;
+  const net = deliveredRevenue - adSpend - cogs - shipping - rtoCost - packaging;
+  const beforeAds = net + adSpend;
+  // break-even delivery %: solve net(d) = 0 per order
+  const denom = aov - cogsU - (shipAll ? 0 : shipU) + rtoU;
+  const beDel = denom > 0 ? (cac + packU + (shipAll ? shipU : 0) + rtoU) / denom : NaN;
+  return {
+    aov, cogsU, orders, cac, d, self, shipU, shipAll, rtoU, packU,
+    adSpend, revenue, delivered, rto, deliveredRevenue, cogs, shipping, rtoCost, packaging,
+    net, beforeAds,
+    roi: adSpend > 0 ? net / adSpend : NaN,
+    beCac: orders > 0 ? beforeAds / orders : NaN,
+    beDel,
+    netPerOrder: orders > 0 ? net / orders : NaN,
+    margin: deliveredRevenue > 0 ? net / deliveredRevenue : NaN,
+  };
+}
+function statsFrom(spend, orders, p) {
+  const m = calcModel({ ...p.calc, orders, cac: orders > 0 ? spend / orders : 0 }, p);
+  const net = orders > 0 ? m.net : -spend;
+  return { spend, orders, cpa: orders > 0 ? spend / orders : NaN, roas: spend > 0 ? orders * m.aov / spend : NaN, net, roi: spend > 0 ? net / spend : NaN };
+}
+function angleStats(a, p) {
+  let s = 0, o = 0;
+  for (const l of a.log) { s += num(l.spend); o += num(l.orders); }
+  return statsFrom(s, o, p);
+}
+function productStats(p) {
+  let s = 0, o = 0;
+  for (const a of p.angles) for (const l of a.log) { s += num(l.spend); o += num(l.orders); }
+  return statsFrom(s, o, p);
+}
+
+/* ---------------- GitHub storage ---------------- */
+function b64encode(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+function b64decode(b64) {
+  const bin = atob(String(b64).replace(/\s/g, ''));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+const gh = {
+  cfg() { try { return JSON.parse(localStorage.getItem(LS_CFG)) || null; } catch { return null; } },
+  ready() { const c = this.cfg(); return !!(c && c.owner && c.repo && c.token && c.path); },
+  repoUrl(c) { return `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}`; },
+  fileUrl(c) { return this.repoUrl(c) + '/contents/' + c.path.replace(/^\/+/, '').split('/').map(encodeURIComponent).join('/'); },
+  headers(c) { return { Authorization: 'Bearer ' + c.token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' }; },
+  async err(r, c) {
+    let msg = ''; try { msg = (await r.json()).message || ''; } catch {}
+    if (r.status === 401) return new Error('GitHub rejected the token (invalid or expired). Update it in Settings.');
+    if (r.status === 403) return new Error('Token lacks permission. It needs “Contents: Read and write” on ' + c.owner + '/' + c.repo + '. ' + msg);
+    if (r.status === 404) return new Error(`Repo ${c.owner}/${c.repo} not found, or the token has no access to it.`);
+    return new Error(`GitHub error ${r.status}: ${msg}`);
+  },
+  async get() {
+    const c = this.cfg(), h = this.headers(c);
+    const r = await fetch(this.fileUrl(c) + '?ref=' + encodeURIComponent(c.branch || 'main'), { headers: h, cache: 'no-store' });
+    if (r.status === 404) {
+      const rr = await fetch(this.repoUrl(c), { headers: h, cache: 'no-store' });
+      if (!rr.ok) throw await this.err(rr, c);
+      return { missing: true, sha: null };
+    }
+    if (!r.ok) throw await this.err(r, c);
+    const j = await r.json();
+    let b64 = j.content;
+    if (!b64 || j.encoding !== 'base64') { // files > 1 MB: fetch the blob instead
+      const br = await fetch(this.repoUrl(c) + '/git/blobs/' + j.sha, { headers: h, cache: 'no-store' });
+      if (!br.ok) throw await this.err(br, c);
+      b64 = (await br.json()).content;
+    }
+    return { sha: j.sha, text: b64decode(b64) };
+  },
+  async put(text, sha, message) {
+    const c = this.cfg();
+    const body = { message, content: b64encode(text), branch: c.branch || 'main' };
+    if (sha) body.sha = sha;
+    const r = await fetch(this.fileUrl(c), { method: 'PUT', headers: { ...this.headers(c), 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (r.status === 409 || (r.status === 422 && !sha)) { const e = new Error('conflict'); e.conflict = true; throw e; }
+    if (!r.ok) throw await this.err(r, c);
+    return (await r.json()).content.sha;
+  },
+  async test(c) {
+    const h = this.headers(c);
+    const rr = await fetch(this.repoUrl(c), { headers: h, cache: 'no-store' });
+    if (!rr.ok) throw await this.err(rr, c);
+    const repo = await rr.json();
+    const canWrite = !repo.permissions || repo.permissions.push;
+    const fr = await fetch(this.fileUrl(c) + '?ref=' + encodeURIComponent(c.branch || 'main'), { headers: h, cache: 'no-store' });
+    const fileOk = fr.ok;
+    return `Connected to ${repo.full_name} (${repo.private ? 'private' : 'public'} repo). `
+      + (canWrite ? 'Write access OK. ' : '⚠ Token is read-only — saving will fail. ')
+      + (fileOk ? 'Data file found.' : 'Data file not there yet — it will be created on first Save.');
+  },
+};
+
+/* ---------------- local draft (survives refresh) ---------------- */
+let draftTimer = 0;
+function persistDraft() {
+  try { localStorage.setItem(LS_DRAFT, JSON.stringify({ data: S.data, baseSha: S.sha, dirty: S.dirty, changes: [...S.changes], at: Date.now() })); } catch {}
+}
+function persistDraftSoon() { clearTimeout(draftTimer); draftTimer = setTimeout(persistDraft, 250); }
+function readDraft() { try { return JSON.parse(localStorage.getItem(LS_DRAFT)); } catch { return null; } }
+
+function markDirty(msg) {
+  S.dirty = true;
+  if (msg) S.changes.add(msg);
+  persistDraftSoon();
+  updateSyncUI();
+}
+function commitMessage() {
+  const c = [...S.changes];
+  if (!c.length) return 'Update store data';
+  const head = c.slice(0, 3).join('; ');
+  return c.length > 3 ? `${head} (+${c.length - 3} more)` : head;
+}
+
+/* ---------------- load / save ---------------- */
+async function loadRemote({ draft = null, silent = false } = {}) {
+  if (!gh.ready()) return;
+  if (!silent) setSync('Loading…');
+  try {
+    const res = await gh.get();
+    const remoteSha = res.sha;
+    if (silent && remoteSha === S.sha) { S.lastLoad = Date.now(); updateSyncUI(); return; }
+    let remoteData = null;
+    if (!res.missing) {
+      try { remoteData = normalize(JSON.parse(res.text)); }
+      catch { throw new Error('The data file on GitHub is not valid JSON. Fix or delete it, then reload.'); }
+    }
+    if (draft && draft.dirty) {
+      if (draft.baseSha === remoteSha) {
+        S.data = normalize(draft.data); S.sha = remoteSha; S.dirty = true; S.changes = new Set(draft.changes || []);
+        if (!silent) toast('Restored your unsaved changes');
+      } else {
+        const k = await choose('Unsaved changes in this browser',
+          'You have changes that were never saved, but the file on GitHub has changed since (maybe from another device). Which version do you want to keep?',
+          [{ k: 'remote', label: 'Use GitHub version' }, { k: 'local', label: 'Keep my changes', primary: true }]);
+        if (k === 'local') { S.data = normalize(draft.data); S.dirty = true; S.changes = new Set([...(draft.changes || []), 'Restore local changes']); }
+        else { S.data = remoteData || emptyData(); S.dirty = !remoteData; S.changes = new Set(remoteData ? [] : ['Create store data']); }
+        S.sha = remoteSha;
+      }
+    } else {
+      S.data = remoteData || emptyData();
+      S.sha = remoteSha;
+      S.dirty = !remoteData;
+      S.changes = new Set(remoteData ? [] : ['Create store data']);
+    }
+    S.loadError = ''; S.lastLoad = Date.now();
+    persistDraft();
+    render(); updateSyncUI();
+    if (!silent) toast(res.missing ? 'Connected. No data file yet — it will be created when you Save.' : 'Loaded latest from GitHub');
+  } catch (e) {
+    S.loadError = e.message;
+    if (!S.data) { S.data = normalize(draft && draft.data); S.dirty = !!(draft && draft.dirty); S.sha = draft ? draft.baseSha : null; }
+    render(); updateSyncUI();
+    if (!silent) toast(e.message, 'error');
+  }
+}
+
+async function save() {
+  if (S.saving) return;
+  if (!gh.ready()) {
+    persistDraft();
+    toast('Kept in this browser only. Connect GitHub in Settings to sync.');
+    location.hash = '#/settings';
+    return;
+  }
+  if (!S.dirty) { toast('Nothing to save — all changes are on GitHub'); return; }
+  S.saving = true; updateSyncUI();
+  const text = JSON.stringify(S.data, null, 2) + '\n';
+  try {
+    S.sha = await gh.put(text, S.sha, commitMessage());
+    S.dirty = false; S.changes.clear(); S.loadError = '';
+    persistDraft(); toast('Saved to GitHub ✓');
+  } catch (e) {
+    if (e.conflict) {
+      S.saving = false; updateSyncUI();
+      const k = await choose('The file changed on GitHub',
+        'Someone (or you on another device) saved a newer version since this page loaded.',
+        [{ k: 'cancel', label: 'Cancel' }, { k: 'remote', label: 'Load theirs (lose mine)', danger: true }, { k: 'mine', label: 'Overwrite with mine', primary: true }]);
+      if (k === 'mine') {
+        try { const cur = await gh.get(); S.sha = cur.sha; S.saving = false; return save(); }
+        catch (e2) { toast(e2.message, 'error'); }
+      } else if (k === 'remote') {
+        S.dirty = false; S.changes.clear(); await loadRemote();
+      }
+    } else {
+      S.loadError = e.message; toast(e.message, 'error');
+    }
+  } finally {
+    S.saving = false; updateSyncUI();
+  }
+}
+
+function setSync(text, cls = '') { const el = $('#syncStatus'); el.textContent = text; el.className = cls; }
+function updateSyncUI() {
+  const btn = $('#saveBtn');
+  btn.disabled = S.saving;
+  btn.textContent = S.saving ? 'Saving…' : 'Save';
+  btn.classList.toggle('pulse', S.dirty);
+  $('#reloadBtn').hidden = !gh.ready();
+  if (S.saving) return setSync('Saving…');
+  if (!gh.ready()) return setSync('Local only — not synced', 'dirty');
+  if (S.loadError) return setSync('⚠ Sync error', 'err');
+  if (S.dirty) return setSync(`● Unsaved changes (${S.changes.size || 1})`, 'dirty');
+  setSync('✓ All changes saved');
+}
+
+/* ---------------- UI primitives ---------------- */
+function toast(msg, kind = '') {
+  const t = document.createElement('div');
+  t.className = 't ' + kind; t.textContent = msg;
+  $('#toast').appendChild(t);
+  setTimeout(() => t.remove(), kind === 'error' ? 6000 : 2600);
+}
+function choose(title, body, options) {
+  return new Promise(res => {
+    const m = $('#modal');
+    m.innerHTML = `<div class="mbox" role="dialog"><h3>${esc(title)}</h3><p>${esc(body)}</p>
+      <div class="row" style="justify-content:flex-end">${options.map(o => `<button class="btn ${o.primary ? 'primary' : ''} ${o.danger ? 'danger' : ''}" data-k="${o.k}">${esc(o.label)}</button>`).join('')}</div></div>`;
+    m.hidden = false;
+    m.onclick = e => { const b = e.target.closest('[data-k]'); if (!b) return; m.hidden = true; m.onclick = null; res(b.dataset.k); };
+  });
+}
+function inp(scope, key, val, { type = 'text', ph = '', cls = '', attrs = '' } = {}) {
+  const isNum = type === 'num';
+  return `<input class="in ${cls}" type="${isNum ? 'number' : type}" ${isNum ? 'step="any" inputmode="decimal"' : ''} data-scope="${scope}" data-key="${key}" data-type="${type}" value="${esc(val ?? '')}" placeholder="${esc(ph)}" ${attrs}>`;
+}
+function ta(scope, key, val, ph = '', rows = 3) {
+  return `<textarea class="in" rows="${rows}" data-scope="${scope}" data-key="${key}" placeholder="${esc(ph)}">${esc(val ?? '')}</textarea>`;
+}
+function fld(label, inner) { return `<label class="f"><span>${label}</span>${inner}</label>`; }
+
+/* scope string -> object being edited */
+function resolve(scope) {
+  const [t, a, b, c] = scope.split(':');
+  if (t === 'settings') return S.data.settings.defaults;
+  if (t === 'scratch') return S.data.scratch;
+  const p = getP(a); if (!p) return null;
+  if (t === 'p') return p;
+  if (t === 'calc') return p.calc;
+  if (t === 'pg') return p.pages.find(x => x.id === b);
+  const an = p.angles.find(x => x.id === b);
+  if (t === 'a') return an;
+  if (t === 'l') return an && an.log.find(x => x.id === c);
+  return null;
+}
+
+/* ---------------- views ---------------- */
+function banner() {
+  let h = '';
+  if (!gh.ready()) h += `<div class="banner">Not connected to GitHub yet — your changes are kept only in this browser. <a href="#/settings">Connect your repo →</a></div>`;
+  if (S.loadError) h += `<div class="banner err"><b>Sync problem:</b> ${esc(S.loadError)} <a href="#/settings">Check settings</a></div>`;
+  return h;
+}
+
+function viewDashboard() {
+  const ps = S.data.products;
+  const by = k => ps.filter(p => p.status === k);
+  const live = by('live');
+  let ls = 0, lo = 0, ln = 0, allSpend = 0;
+  const liveRows = live.map(p => {
+    const st = productStats(p);
+    ls += st.spend; lo += st.orders; ln += st.net;
+    let best = null;
+    for (const a of p.angles) { const s = angleStats(a, p); if (s.spend > 0 && (!best || s.roi > best.s.roi)) best = { a, s }; }
+    return { p, st, best };
+  }).sort((x, y) => y.st.spend - x.st.spend);
+  for (const p of ps) allSpend += productStats(p).spend;
+
+  const angles = [];
+  for (const p of ps) p.angles.forEach((a, i) => { const s = angleStats(a, p); if (s.spend > 0) angles.push({ p, a, i, s }); });
+  angles.sort((x, y) => (y.s.roi || -1e9) - (x.s.roi || -1e9));
+
+  const pipe = by('pipeline').map(p => ({ p, m: calcModel(p.calc, p) })).sort((x, y) => (y.m.roi || -1e9) - (x.m.roi || -1e9));
+
+  return banner() + `
+  <div class="tiles">
+    <div class="tile pipeline"><span>Pipeline</span><b>${by('pipeline').length}</b></div>
+    <div class="tile live"><span>Live</span><b>${live.length}</b></div>
+    <div class="tile stopped"><span>Stopped</span><b>${by('stopped').length}</b></div>
+    <div class="tile"><span>Live ad spend</span><b>${inr(ls)}</b><small>All-time: ${inr(allSpend)}</small></div>
+    <div class="tile"><span>Live orders</span><b>${n0(lo)}</b><small>Blended CPA ${inr(lo ? ls / lo : NaN)}</small></div>
+    <div class="tile"><span>Live est. net profit</span><b class="${ln >= 0 ? 'pos' : 'negv'}">${inr(ln)}</b><small>ROI ${pct(ls ? ln / ls : NaN, 1)}</small></div>
+  </div>
+
+  <section class="card">
+    <div class="card-h"><h3>Live products</h3><a href="#/board">All products →</a></div>
+    ${liveRows.length ? `<div class="wrap"><table class="data">
+      <thead><tr><th>Product</th><th>Spend</th><th>Orders</th><th>CPA</th><th>ROAS</th><th>Est. profit</th><th>ROI</th><th class="l">Best angle</th></tr></thead>
+      <tbody>${liveRows.map(({ p, st, best }) => `<tr data-act="open" data-id="${p.id}">
+        <td>${esc(p.name || 'Untitled')}</td><td>${inr(st.spend)}</td><td>${n0(st.orders)}</td><td>${inr(st.cpa)}</td><td>${xx(st.roas)}</td>
+        <td class="${st.net >= 0 ? 'pos' : 'negv'}">${inr(st.net)}</td><td>${pct(st.roi, 1)}</td>
+        <td class="l">${best ? esc(best.a.title || 'Untitled angle') + ` <span class="mute">(${pct(best.s.roi, 0)})</span>` : '<span class="mute">—</span>'}</td></tr>`).join('')}</tbody>
+    </table></div>` : `<div class="empty">No live products yet. Move a product from Pipeline to Live on the <a href="#/board">board</a>.</div>`}
+  </section>
+
+  <section class="card">
+    <h3>Top angles by ROI</h3>
+    ${angles.length ? `<div class="wrap"><table class="data">
+      <thead><tr><th>Angle</th><th class="l">Product</th><th class="l">Status</th><th>Spend</th><th>Orders</th><th>CPA</th><th>Est. profit</th><th>ROI</th></tr></thead>
+      <tbody>${angles.slice(0, 12).map(({ p, a, i, s }) => `<tr data-act="open" data-id="${p.id}" data-angle="${a.id}">
+        <td class="l"><b>A${i + 1}</b> ${esc(a.title || 'Untitled angle')}</td><td class="l">${esc(p.name)}</td><td class="l"><span class="tag st-${a.status.toLowerCase()}">${esc(a.status)}</span></td>
+        <td>${inr(s.spend)}</td><td>${n0(s.orders)}</td><td>${inr(s.cpa)}</td><td class="${s.net >= 0 ? 'pos' : 'negv'}">${inr(s.net)}</td><td>${pct(s.roi, 1)}</td></tr>`).join('')}</tbody>
+    </table></div>` : `<div class="empty">Log daily spend &amp; orders on your angles to see which ones win.</div>`}
+  </section>
+
+  <section class="card">
+    <h3>Pipeline — ranked by projected ROI</h3>
+    ${pipe.length ? `<div class="wrap"><table class="data">
+      <thead><tr><th>Product</th><th>Selling price</th><th>Angles</th><th>Proj. net profit</th><th>Proj. ROI</th><th>Break-even CAC</th></tr></thead>
+      <tbody>${pipe.map(({ p, m }) => `<tr data-act="open" data-id="${p.id}"><td>${esc(p.name || 'Untitled')}</td><td>${inr(num(p.sellingPrice) || NaN)}</td><td>${p.angles.length}</td>
+        <td class="${m.net >= 0 ? 'pos' : 'negv'}">${inr(m.net)}</td><td>${pct(m.roi, 1)}</td><td>${inr(m.beCac)}</td></tr>`).join('')}</tbody>
+    </table></div>` : `<div class="empty">Nothing in the pipeline. <a href="#/board">Add a product →</a></div>`}
+  </section>`;
+}
+
+function cardHTML(p) {
+  const st = productStats(p);
+  let line;
+  if (p.status === 'pipeline') {
+    const m = calcModel(p.calc, p);
+    line = m.orders && m.aov ? `<span class="mute">Proj.</span><span class="${m.net >= 0 ? 'pos' : 'negv'}">${inr(m.net)}</span><span>ROI ${pct(m.roi, 0)}</span>` : '<span class="mute">Fill in prices to see projection</span>';
+  } else if (st.spend > 0) {
+    line = `<span>Spend ${inr(st.spend)}</span><span>ROAS ${xx(st.roas)}</span><span class="${st.net >= 0 ? 'pos' : 'negv'}">${inr(st.net)}</span>`;
+  } else line = '<span class="mute">No spend logged</span>';
+  const img = safeUrl(p.image);
+  return `<div class="pcard" draggable="true" data-act="open" data-id="${p.id}" data-name="${esc((p.name || '').toLowerCase())}">
+    <div class="pc-top">${img ? `<img class="thumb" src="${esc(img)}" alt="" loading="lazy">` : `<div class="thumb ph">${esc((p.name || '?').trim()[0] || '?')}</div>`}
+      <div><div class="pc-name">${esc(p.name || 'Untitled')}</div>
+      <div class="pc-sub">${num(p.sellingPrice) ? inr(num(p.sellingPrice)) : 'No price'} · ${p.angles.length} angle${p.angles.length === 1 ? '' : 's'}</div></div></div>
+    <div class="pc-stats">${line}</div>
+    <div class="pc-move">${STAGES.filter(s => s.key !== p.status).map(s => `<button class="chip" data-act="move" data-id="${p.id}" data-to="${s.key}">→ ${s.label}</button>`).join('')}</div>
+  </div>`;
+}
+function stageSortKey(p) { return p.status === 'live' ? (p.liveAt || '') : p.status === 'stopped' ? (p.stoppedAt || '') : (p.createdAt || ''); }
+
+function viewBoard() {
+  return banner() + `
+  <div class="toolbar">
+    <input id="boardSearch" class="in" placeholder="Search products…" value="${esc(S.boardQ)}">
+    <button class="btn primary" data-act="add-product">+ Add product</button>
+  </div>
+  <div class="board">${STAGES.map(s => {
+    const items = S.data.products.filter(p => p.status === s.key).sort((a, b) => stageSortKey(b).localeCompare(stageSortKey(a)));
+    return `<div class="col" data-drop="${s.key}">
+      <div class="col-h"><span class="dot ${s.key}"></span>${s.label}<span class="count">${items.length}</span></div>
+      <div class="col-b">${items.map(cardHTML).join('') || '<div class="col-empty">Drag products here</div>'}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function calcBlock(scope, c, p) {
+  const self = c.mode === 'self';
+  const f = (key, label, suffix, ph = '') => fld(label, `<div class="ig">${inp(scope, key, c[key], { type: 'num', ph })}${suffix ? `<em>${suffix}</em>` : ''}</div>`);
+  return `<div class="calc">
+    <div class="calc-in">
+      <div class="seg" role="radiogroup">
+        <label><input type="radio" name="mode-${scope}" value="aggregator" data-scope="${scope}" data-key="mode" data-rerender ${!self ? 'checked' : ''}><span>Aggregator</span></label>
+        <label><input type="radio" name="mode-${scope}" value="self" data-scope="${scope}" data-key="mode" data-rerender ${self ? 'checked' : ''}><span>Self-ship / Pvt supplier</span></label>
+      </div>
+      <p class="hint">${self ? 'You pay forward shipping yourself. RTO cost = extra return charge per RTO order.' : 'RTO charge is fixed and already includes shipping — no separate shipping cost.'}</p>
+      <div class="two">
+        ${f('aov', 'Price (AOV)', '₹', p ? '= selling price' : '')}
+        ${f('orders', 'Total orders', '')}
+        ${f('cac', 'CAC', '₹/order')}
+        ${f('deliveryPct', 'Delivery %', '%')}
+        ${f('cogs', 'COGS', '₹/unit', p ? '= listing price' : '')}
+        ${f('rto', 'RTO cost', '₹/RTO')}
+        ${self ? f('shipping', 'Shipping', '₹/order') : ''}
+        ${self ? fld('Charge shipping on', `<select class="in" data-scope="${scope}" data-key="shippingBasis">
+            <option value="all" ${c.shippingBasis !== 'delivered' ? 'selected' : ''}>All dispatched orders</option>
+            <option value="delivered" ${c.shippingBasis === 'delivered' ? 'selected' : ''}>Delivered orders only</option></select>`) : ''}
+        ${f('packaging', 'Packaging', '₹/order')}
+      </div>
+      ${p ? `<button class="btn sm" data-act="use-actuals" data-id="${p.id}" title="Sets Total orders and CAC from the spend & orders logged on this product's angles">Use actual orders &amp; CAC from angles</button>` : ''}
+    </div>
+    <div class="calc-out" data-derived="calc|${scope}">${calcOut(scope)}</div>
+  </div>`;
+}
+function calcOut(scope) {
+  const c = resolve(scope); if (!c) return '';
+  const p = scope.startsWith('calc:') ? getP(scope.split(':')[1]) : null;
+  const m = calcModel(c, p);
+  const row = (l, v, sub = '', cls = '') => `<tr class="${cls}"><th>${l}</th><td>${v}</td><td class="sub">${sub}</td></tr>`;
+  const dp = Number.isInteger(Math.round(m.d * 1000) / 10) ? 0 : 1;
+  const beDel = !isFinite(m.beDel) ? '—' : m.beDel > 1 ? '>100%' : pct(m.beDel, 1);
+  return `<table class="pl">
+    ${row('Product price (AOV)', inr(m.aov))}
+    ${row('Total orders', n0(m.orders))}
+    ${row('CAC', inr(m.cac))}
+    ${row('Ad spend', inr(m.adSpend), '', 'cost')}
+    ${row('Total revenue', inr(m.revenue))}
+    ${row('Delivery %', pct(m.d, dp))}
+    ${row('Delivered revenue (actual)', inr(m.deliveredRevenue), '', 'em')}
+    ${row('Delivered orders', n0(m.delivered))}
+    ${row('RTO orders', n0(m.rto))}
+    ${row('COGS of delivered orders', inr(m.cogs), inr(m.cogsU) + ' per unit', 'cost')}
+    ${m.self ? row('Shipping cost', inr(m.shipping), inr(m.shipU) + (m.shipAll ? ' per order' : ' per delivered'), 'cost') : row('Shipping cost', inr(0), 'in RTO charge')}
+    ${row('RTO cost', inr(m.rtoCost), inr(m.rtoU) + ' per order', 'cost')}
+    ${row('Packaging cost', inr(m.packaging), inr(m.packU) + ' per order', 'cost')}
+  </table>
+  <div class="np ${m.net >= 0 ? 'pos' : 'negv'}"><span>Net profit</span><strong>${inr(m.net)}</strong></div>
+  <div class="kpis">
+    <div title="Net profit ÷ ad spend"><span>ROI</span><b>${pct(m.roi)}</b></div>
+    <div title="Net profit + ad spend"><span>Profit before ads</span><b>${inr(m.beforeAds)}</b></div>
+    <div title="Net profit ÷ total orders"><span>Net / order</span><b>${inr(m.netPerOrder)}</b></div>
+    <div title="Max CAC at this delivery % before you lose money"><span>Break-even CAC</span><b>${inr(m.beCac)}</b></div>
+    <div title="Min delivery % at this CAC before you lose money"><span>Break-even del. %</span><b>${beDel}</b></div>
+    <div title="Net profit ÷ delivered revenue"><span>Net margin</span><b>${pct(m.margin, 1)}</b></div>
+  </div>`;
+}
+
+function angleTotals(p, a) {
+  const s = angleStats(a, p);
+  if (!s.spend && !s.orders) return '<span class="tot">No data logged yet</span>';
+  return `<span class="tot">${inr(s.spend)} spend · ${n0(s.orders)} orders · CPA ${inr(s.cpa)} · ROAS ${xx(s.roas)} · Est. <b class="${s.net >= 0 ? 'pos' : 'negv'}">${inr(s.net)}</b> (${pct(s.roi, 0)})</span>`;
+}
+function angleSummary(p) {
+  const rows = p.angles.map((a, i) => ({ a, i, s: angleStats(a, p) }));
+  const withSpend = rows.filter(r => r.s.spend > 0);
+  if (!p.angles.length) return '';
+  if (!withSpend.length) return `<p class="hint" style="margin:0">Once you log daily spend &amp; orders on each angle, a comparison table appears here showing which angle performs best.</p>`;
+  const tot = productStats(p);
+  const best = withSpend.reduce((b, r) => (!b || r.s.roi > b.s.roi) ? r : b, null);
+  return `<div class="wrap"><table class="data">
+    <thead><tr><th>Angle</th><th class="l">Status</th><th>Spend</th><th class="l">Share</th><th>Orders</th><th>CPA</th><th>ROAS</th><th>Est. profit</th><th>ROI</th></tr></thead>
+    <tbody>${rows.map(({ a, i, s }) => `<tr>
+      <td class="l">${best && best.a === a ? '<span class="star" title="Best ROI">★</span> ' : ''}<b>A${i + 1}</b> <a href="#angle-${a.id}" data-act="jump" data-angle="${a.id}">${esc(a.title || 'Untitled angle')}</a></td>
+      <td class="l"><span class="tag st-${a.status.toLowerCase()}">${esc(a.status)}</span></td>
+      <td>${inr(s.spend)}</td>
+      <td class="l"><span class="bar" style="width:${tot.spend ? Math.round(60 * s.spend / tot.spend) : 0}px"></span>${pct(tot.spend ? s.spend / tot.spend : NaN, 0)}</td>
+      <td>${n0(s.orders)}</td><td>${inr(s.cpa)}</td><td>${xx(s.roas)}</td>
+      <td class="${s.net >= 0 ? 'pos' : 'negv'}">${s.spend ? inr(s.net) : '—'}</td><td>${pct(s.roi, 1)}</td></tr>`).join('')}</tbody>
+    <tfoot><tr><td class="l">Total</td><td></td><td>${inr(tot.spend)}</td><td></td><td>${n0(tot.orders)}</td><td>${inr(tot.cpa)}</td><td>${xx(tot.roas)}</td>
+      <td class="${tot.net >= 0 ? 'pos' : 'negv'}">${inr(tot.net)}</td><td>${pct(tot.roi, 1)}</td></tr></tfoot>
+  </table></div>
+  <p class="hint">Est. profit applies this product's calculator (delivery %, COGS, RTO, shipping) to each angle's real orders and spend.</p>`;
+}
+
+function angleCard(p, a, i) {
+  const sc = `a:${p.id}:${a.id}`;
+  return `<section class="card angle" id="angle-${a.id}">
+    <div class="angle-h">
+      <span class="anum">A${i + 1}</span>
+      ${inp(sc, 'title', a.title, { cls: 'angle-title', ph: 'Angle title (e.g. “Neck pain from WFH”)' })}
+      <select class="in pill-select st-${a.status.toLowerCase()}" data-scope="${sc}" data-key="status">${ANGLE_STATUS.map(s => `<option ${s === a.status ? 'selected' : ''}>${s}</option>`).join('')}</select>
+      <button class="btn ghost sm" data-act="copy-angle" data-id="${p.id}" data-angle="${a.id}" title="Copy hook, body & CTA">Copy</button>
+      <button class="btn ghost sm" data-act="dup-angle" data-id="${p.id}" data-angle="${a.id}">Duplicate</button>
+      <button class="btn ghost sm danger" data-act="del-angle" data-id="${p.id}" data-angle="${a.id}">Delete</button>
+    </div>
+    ${fld('Ideation', ta(sc, 'ideation', a.ideation, 'Who is this for? What pain or desire does it hit? Reference ads, insights, notes for when you write it…', 2))}
+    <div class="hbc">
+      ${fld('Hook', ta(sc, 'hook', a.hook, 'First 3 seconds — the scroll-stopper', 4))}
+      ${fld('Body', ta(sc, 'body', a.body, 'Problem → product → proof → benefits', 4))}
+      ${fld('CTA', ta(sc, 'cta', a.cta, 'Offer, urgency, COD available…', 4))}
+    </div>
+    <details class="perf" ${p.status !== 'pipeline' || a.log.length ? 'open' : ''}>
+      <summary>Performance <span data-derived="angletot|${p.id}|${a.id}">${angleTotals(p, a)}</span></summary>
+      ${a.log.length ? `<table class="log"><thead><tr><th style="width:150px">Date</th><th style="width:140px">Spend ₹</th><th style="width:110px">Orders</th><th>Note</th><th style="width:36px"></th></tr></thead>
+      <tbody>${a.log.map(l => { const ls = `l:${p.id}:${a.id}:${l.id}`; return `<tr>
+        <td>${inp(ls, 'date', l.date, { type: 'date' })}</td>
+        <td>${inp(ls, 'spend', l.spend, { type: 'num', ph: '0' })}</td>
+        <td>${inp(ls, 'orders', l.orders, { type: 'num', ph: '0' })}</td>
+        <td>${inp(ls, 'note', l.note, { ph: 'Budget change, creative swap…' })}</td>
+        <td><button class="icon-btn del" title="Remove row" data-act="del-log" data-id="${p.id}" data-angle="${a.id}" data-log="${l.id}">✕</button></td></tr>`; }).join('')}</tbody></table>` : '<p class="hint">Add a row per day (or per period) with spend and orders from your ads manager.</p>'}
+      <button class="btn sm" data-act="add-log" data-id="${p.id}" data-angle="${a.id}">+ Add day</button>
+    </details>
+  </section>`;
+}
+
+function viewProduct(id) {
+  const p = getP(id);
+  if (!p) return `<div class="empty">Product not found. <a href="#/board">Back to products</a></div>`;
+  const sc = `p:${p.id}`;
+  const img = safeUrl(p.image);
+  return banner() + `
+  <div class="ph">
+    <a class="back" href="#/board">← Products</a>
+    <div class="ph-row">
+      ${img ? `<img class="thumb lg" src="${esc(img)}" alt="">` : ''}
+      <input class="title-in" data-scope="${sc}" data-key="name" value="${esc(p.name)}" placeholder="Product name">
+      <div class="seg">${STAGES.map(s => `<button class="${p.status === s.key ? 'on ' + s.key : ''}" data-act="move" data-id="${p.id}" data-to="${s.key}">${s.label}</button>`).join('')}</div>
+      <button class="btn ghost sm danger" data-act="del-product" data-id="${p.id}">Delete</button>
+    </div>
+    <div class="meta">Added ${esc(p.createdAt || '—')}${p.liveAt ? ` · Went live ${esc(p.liveAt)}` : ''}${p.status === 'stopped' && p.stoppedAt ? ` · Stopped ${esc(p.stoppedAt)}` : ''}</div>
+  </div>
+
+  <div class="grid2">
+    <section class="card">
+      <h3>Product details</h3>
+      ${fld('Product listing link', `<div class="ig">${inp(sc, 'listingLink', p.listingLink, { type: 'url', ph: 'https://…' })}<button class="icon-btn" title="Open" data-act="open-link" data-src="listingLink">↗</button></div>`)}
+      <div class="two">
+        ${fld('Listing price', `<div class="ig">${inp(sc, 'listingPrice', p.listingPrice, { type: 'num', ph: '0' })}<em>₹</em></div>`)}
+        ${fld('Selling price', `<div class="ig">${inp(sc, 'sellingPrice', p.sellingPrice, { type: 'num', ph: '0' })}<em>₹</em></div>`)}
+      </div>
+      <div class="f"><span>Product pages</span>
+        <div class="pages">${p.pages.map(pg => `<div class="pg">
+          ${inp(`pg:${p.id}:${pg.id}`, 'label', pg.label, { ph: 'Label' })}
+          ${inp(`pg:${p.id}:${pg.id}`, 'url', pg.url, { type: 'url', ph: 'https://yourstore.com/products/…' })}
+          <button class="icon-btn" title="Open" data-act="open-link" data-src="url">↗</button>
+          <button class="icon-btn del" title="Remove" data-act="del-page" data-id="${p.id}" data-page="${pg.id}">✕</button></div>`).join('')}</div>
+        <button class="btn sm" data-act="add-page" data-id="${p.id}">+ Add product page</button>
+      </div>
+      ${fld('Image URL (optional)', inp(sc, 'image', p.image, { type: 'url', ph: 'https://… (shows as thumbnail)' }))}
+      ${fld('Notes', ta(sc, 'notes', p.notes, 'Supplier, competitors, research, offer ideas…', 3))}
+      ${p.status === 'stopped' ? fld('Why stopped?', ta(sc, 'stopReason', p.stopReason, 'High RTO, CAC too high, supplier issue…', 2)) : ''}
+    </section>
+    <section class="card">
+      <h3>Unit economics</h3>
+      ${calcBlock('calc:' + p.id, p.calc, p)}
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="card-h"><h3>Marketing angles <span class="count">${p.angles.length}</span></h3>
+      <button class="btn primary sm" data-act="add-angle" data-id="${p.id}">+ New angle</button></div>
+    <div data-derived="anglesum|${p.id}">${angleSummary(p)}</div>
+    ${p.angles.length ? '' : '<div class="empty">No angles yet. Each angle gets a title, ideation, and hook / body / CTA.</div>'}
+  </section>
+  ${p.angles.map((a, i) => angleCard(p, a, i)).join('')}`;
+}
+
+function viewCalc() {
+  return `<section class="card">
+    <div class="card-h"><h3>Quick calculator</h3><button class="btn sm" data-act="reset-scratch">Reset to example</button></div>
+    <p class="hint">A scratchpad for quick what-ifs, saved with your data. Every product also has its own calculator on its page.</p>
+    ${calcBlock('scratch', S.data.scratch, null)}
+  </section>`;
+}
+
+function viewSettings() {
+  const c = gh.cfg() || { owner: '', repo: '', branch: 'main', path: 'data/store.json', token: '' };
+  const d = S.data.settings.defaults;
+  const ready = gh.ready();
+  const histUrl = ready ? `https://github.com/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/commits/${encodeURIComponent(c.branch || 'main')}/${c.path.split('/').map(encodeURIComponent).join('/')}` : '';
+  const sc = 'settings';
+  const f = (key, label, suffix) => fld(label, `<div class="ig">${inp(sc, key, d[key], { type: 'num' })}${suffix ? `<em>${suffix}</em>` : ''}</div>`);
+  return banner() + `
+  <section class="card narrow">
+    <h3>GitHub sync</h3>
+    <p class="hint">All your data is one JSON file in a GitHub repo. Every <b>Save</b> becomes a commit, so you get full history and can undo anything from GitHub. Your token is stored only in this browser.</p>
+    <form id="cfgForm" autocomplete="off">
+      <div class="two">
+        ${fld('Owner (username or org)', `<input class="in" name="owner" value="${esc(c.owner)}" placeholder="your-github-username" required>`)}
+        ${fld('Data repo', `<input class="in" name="repo" value="${esc(c.repo)}" placeholder="store-hq" required>`)}
+        ${fld('Branch', `<input class="in" name="branch" value="${esc(c.branch || 'main')}" required>`)}
+        ${fld('File path', `<input class="in" name="path" value="${esc(c.path || 'data/store.json')}" required>`)}
+      </div>
+      ${fld('Fine-grained personal access token', `<input class="in" name="token" type="password" value="${esc(c.token)}" placeholder="github_pat_…" required>`)}
+      <div class="row">
+        <button class="btn primary" type="submit">${ready ? 'Update & reload' : 'Connect & load'}</button>
+        <button class="btn" type="button" data-act="test-conn">Test connection</button>
+        ${c.token ? '<button class="btn ghost danger" type="button" data-act="disconnect">Forget token on this device</button>' : ''}
+      </div>
+      <p id="cfgMsg" class="hint"></p>
+    </form>
+    ${ready ? `<a href="${esc(histUrl)}" target="_blank" rel="noopener">View change history on GitHub ↗</a>` : ''}
+  </section>
+
+  <section class="card narrow">
+    <h3>Calculator defaults for new products</h3>
+    <p class="hint">Used when you add a product. Existing products keep their own numbers.</p>
+    <div class="two">
+      ${fld('Default model', `<select class="in" data-scope="${sc}" data-key="mode">
+        <option value="aggregator" ${d.mode !== 'self' ? 'selected' : ''}>Aggregator</option>
+        <option value="self" ${d.mode === 'self' ? 'selected' : ''}>Self-ship / Pvt supplier</option></select>`)}
+      ${f('orders', 'Projected orders', '')}
+      ${f('cac', 'CAC', '₹/order')}
+      ${f('deliveryPct', 'Delivery %', '%')}
+      ${f('rto', 'RTO cost', '₹/RTO')}
+      ${f('shipping', 'Shipping (self-ship)', '₹/order')}
+      ${f('packaging', 'Packaging', '₹/order')}
+    </div>
+  </section>
+
+  <section class="card narrow">
+    <h3>Backup</h3>
+    <p class="hint">GitHub already keeps every version, but you can also download a copy or restore from a file.</p>
+    <div class="row">
+      <button class="btn" data-act="export">Download backup (.json)</button>
+      <label class="btn">Restore from file…<input type="file" id="importFile" accept="application/json,.json" hidden></label>
+      ${S.dirty && ready ? '<button class="btn ghost danger" data-act="discard">Discard unsaved changes</button>' : ''}
+    </div>
+  </section>`;
+}
+
+/* ---------------- render / router ---------------- */
+function route() {
+  const h = location.hash.replace(/^#\/?/, '');
+  const [r, id] = h.split('/');
+  return { r: r || 'dashboard', id };
+}
+function render() {
+  const view = $('#view');
+  if (!S.data) { view.innerHTML = '<div class="loading">Loading…</div>'; return; }
+  const { r, id } = route();
+  const navKey = r === 'p' ? 'board' : r;
+  $$('#nav a').forEach(a => a.classList.toggle('on', a.dataset.nav === navKey));
+  let html;
+  switch (r) {
+    case 'board': html = viewBoard(); break;
+    case 'p': html = viewProduct(id); break;
+    case 'calc': html = viewCalc(); break;
+    case 'settings': html = viewSettings(); break;
+    default: html = viewDashboard();
+  }
+  view.innerHTML = html;
+  if (r === 'board' && S.boardQ) filterBoard();
+  const p = r === 'p' && getP(id);
+  document.title = (p ? (p.name || 'Untitled') + ' · ' : '') + 'Store HQ';
+}
+function updateDerived() {
+  $$('[data-derived]').forEach(el => {
+    const [t, a, b] = el.dataset.derived.split('|');
+    if (t === 'calc') el.innerHTML = calcOut(a);
+    else if (t === 'anglesum') { const p = getP(a); if (p) el.innerHTML = angleSummary(p); }
+    else if (t === 'angletot') { const p = getP(a); const an = p && p.angles.find(x => x.id === b); if (an) el.innerHTML = angleTotals(p, an); }
+  });
+}
+function filterBoard() {
+  const q = S.boardQ.trim().toLowerCase();
+  $$('.pcard').forEach(c => { c.hidden = !!q && !c.dataset.name.includes(q); });
+}
+
+/* ---------------- actions ---------------- */
+function setStatus(p, to) {
+  if (!p || p.status === to) return;
+  p.status = to;
+  if (to === 'live' && !p.liveAt) p.liveAt = today();
+  if (to === 'live') p.stoppedAt = p.stoppedAt || null;
+  if (to === 'stopped') p.stoppedAt = today();
+  p.updatedAt = Date.now();
+  markDirty(`Move ${p.name || 'product'} → ${to}`);
+}
+function newAngle() { return { id: uid(), title: '', ideation: '', hook: '', body: '', cta: '', status: 'Idea', createdAt: today(), log: [] }; }
+
+const actions = {
+  'open'(el) { location.hash = '#/p/' + el.dataset.id; if (el.dataset.angle) setTimeout(() => { const t = document.getElementById('angle-' + el.dataset.angle); if (t) t.scrollIntoView({ block: 'start' }); }, 80); },
+  'jump'(el, e) { e.preventDefault(); const t = document.getElementById('angle-' + el.dataset.angle); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); },
+  'add-product'() {
+    const p = { id: uid(), name: '', status: 'pipeline', createdAt: today(), updatedAt: Date.now(), listingLink: '', listingPrice: null, sellingPrice: null, image: '', notes: '', pages: [], angles: [], calc: calcFrom(S.data.settings.defaults) };
+    S.data.products.push(p);
+    markDirty('Add product');
+    location.hash = '#/p/' + p.id;
+    setTimeout(() => { const t = $('.title-in'); if (t) t.focus(); }, 30);
+  },
+  'move'(el) { setStatus(getP(el.dataset.id), el.dataset.to); render(); },
+  async 'del-product'(el) {
+    const p = getP(el.dataset.id);
+    const k = await choose('Delete product?', `“${p.name || 'Untitled'}” and all its angles will be removed. (You can still recover it from GitHub history after saving.)`, [{ k: 'no', label: 'Cancel' }, { k: 'yes', label: 'Delete', danger: true, primary: true }]);
+    if (k !== 'yes') return;
+    S.data.products = S.data.products.filter(x => x !== p);
+    markDirty(`Delete ${p.name || 'product'}`);
+    location.hash = '#/board';
+  },
+  'add-angle'(el) {
+    const p = getP(el.dataset.id); const a = newAngle(); p.angles.push(a);
+    markDirty(`Add angle to ${p.name || 'product'}`); render();
+    const t = document.getElementById('angle-' + a.id); if (t) { t.scrollIntoView({ block: 'start', behavior: 'smooth' }); $('.angle-title', t).focus({ preventScroll: true }); }
+  },
+  'dup-angle'(el) {
+    const p = getP(el.dataset.id); const i = p.angles.findIndex(a => a.id === el.dataset.angle);
+    const c = { ...JSON.parse(JSON.stringify(p.angles[i])), id: uid(), title: (p.angles[i].title || 'Angle') + ' (copy)', status: 'Idea', createdAt: today(), log: [] };
+    p.angles.splice(i + 1, 0, c); markDirty(`Duplicate angle in ${p.name || 'product'}`); render();
+  },
+  async 'del-angle'(el) {
+    const p = getP(el.dataset.id); const a = p.angles.find(x => x.id === el.dataset.angle);
+    const k = await choose('Delete angle?', `“${a.title || 'Untitled angle'}” and its performance log will be removed.`, [{ k: 'no', label: 'Cancel' }, { k: 'yes', label: 'Delete', danger: true, primary: true }]);
+    if (k !== 'yes') return;
+    p.angles = p.angles.filter(x => x !== a); markDirty(`Delete angle from ${p.name || 'product'}`); render();
+  },
+  async 'copy-angle'(el) {
+    const p = getP(el.dataset.id); const a = p.angles.find(x => x.id === el.dataset.angle);
+    const txt = `${a.title || ''}\n\nHOOK:\n${a.hook || ''}\n\nBODY:\n${a.body || ''}\n\nCTA:\n${a.cta || ''}`.trim();
+    try { await navigator.clipboard.writeText(txt); toast('Angle copied'); } catch { toast('Could not access clipboard', 'error'); }
+  },
+  'add-log'(el) {
+    const p = getP(el.dataset.id); const a = p.angles.find(x => x.id === el.dataset.angle);
+    const l = { id: uid(), date: today(), spend: null, orders: null, note: '' }; a.log.push(l);
+    markDirty(`Log performance for ${p.name || 'product'}`); render();
+    const t = $(`[data-scope="l:${p.id}:${a.id}:${l.id}"][data-key="spend"]`); if (t) t.focus();
+  },
+  'del-log'(el) {
+    const p = getP(el.dataset.id); const a = p.angles.find(x => x.id === el.dataset.angle);
+    a.log = a.log.filter(l => l.id !== el.dataset.log); markDirty(`Edit performance for ${p.name || 'product'}`); render();
+  },
+  'add-page'(el) { const p = getP(el.dataset.id); p.pages.push({ id: uid(), label: '', url: '' }); markDirty(`Update ${p.name || 'product'}`); render(); },
+  'del-page'(el) { const p = getP(el.dataset.id); p.pages = p.pages.filter(x => x.id !== el.dataset.page); markDirty(`Update ${p.name || 'product'}`); render(); },
+  'open-link'(el) {
+    const input = el.parentElement.querySelector(`[data-key="${el.dataset.src}"]`);
+    const u = safeUrl(input && input.value);
+    if (u) window.open(u, '_blank', 'noopener'); else toast('Enter a full link starting with https://', 'error');
+  },
+  'use-actuals'(el) {
+    const p = getP(el.dataset.id); const st = productStats(p);
+    if (!st.orders) { toast('No orders logged on this product’s angles yet', 'error'); return; }
+    p.calc.orders = st.orders; p.calc.cac = Math.round(st.cpa * 100) / 100;
+    markDirty(`Update ${p.name || 'product'} calculator`); render(); toast('Calculator now uses your real orders & CAC');
+  },
+  'reset-scratch'() { S.data.scratch = exampleCalc(); markDirty('Reset calculator'); render(); },
+  async 'test-conn'() {
+    const c = formCfg(); const msg = $('#cfgMsg');
+    if (!c.owner || !c.repo || !c.token) { msg.textContent = 'Fill in owner, repo and token first.'; return; }
+    msg.textContent = 'Testing…';
+    try { msg.textContent = '✓ ' + await gh.test(c); } catch (e) { msg.textContent = '✕ ' + e.message; }
+  },
+  async 'disconnect'() {
+    const k = await choose('Forget token?', 'This device will stop syncing until you enter a token again. Unsaved changes stay in this browser.', [{ k: 'no', label: 'Cancel' }, { k: 'yes', label: 'Forget token', danger: true, primary: true }]);
+    if (k !== 'yes') return;
+    const c = gh.cfg() || {}; c.token = ''; localStorage.setItem(LS_CFG, JSON.stringify(c)); S.loadError = ''; render(); updateSyncUI();
+  },
+  'export'() {
+    const blob = new Blob([JSON.stringify(S.data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `store-hq-backup-${today()}.json`; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  },
+  async 'discard'() {
+    const k = await choose('Discard unsaved changes?', 'Reloads the last saved version from GitHub.', [{ k: 'no', label: 'Cancel' }, { k: 'yes', label: 'Discard', danger: true, primary: true }]);
+    if (k === 'yes') { S.dirty = false; S.changes.clear(); await loadRemote(); }
+  },
+};
+function formCfg() {
+  const f = $('#cfgForm'); const v = n => f.elements[n].value.trim();
+  return { owner: v('owner'), repo: v('repo'), branch: v('branch') || 'main', path: v('path').replace(/^\/+/, '') || 'data/store.json', token: v('token') };
+}
+
+/* ---------------- events ---------------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const fn = actions[el.dataset.act]; if (!fn) return;
+  if (el.tagName === 'BUTTON' || el.tagName === 'A') e.preventDefault();
+  e.stopPropagation();
+  fn(el, e);
+});
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.id === 'boardSearch') { S.boardQ = el.value; filterBoard(); return; }
+  if (!el.dataset || !el.dataset.scope) return;
+  const obj = resolve(el.dataset.scope); if (!obj) return;
+  let v = el.value;
+  if (el.dataset.type === 'num') v = v === '' ? null : Number(v);
+  obj[el.dataset.key] = v;
+  const [t, pid] = el.dataset.scope.split(':');
+  const p = ['p', 'calc', 'a', 'l', 'pg'].includes(t) ? getP(pid) : null;
+  if (p) p.updatedAt = Date.now();
+  markDirty(p ? `Update ${p.name || 'product'}` : t === 'scratch' ? 'Update calculator' : 'Update settings');
+  if (el.classList.contains('pill-select')) el.className = 'in pill-select st-' + String(v).toLowerCase();
+  if (el.hasAttribute('data-rerender')) render(); else updateDerived();
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'importFile') {
+    const file = e.target.files[0]; if (!file) return;
+    file.text().then(async txt => {
+      let d; try { d = normalize(JSON.parse(txt)); } catch { toast('That file is not valid JSON', 'error'); return; }
+      const k = await choose('Restore from backup?', `This replaces everything with the backup (${d.products.length} products). Click Save afterwards to push it to GitHub.`, [{ k: 'no', label: 'Cancel' }, { k: 'yes', label: 'Restore', primary: true }]);
+      if (k !== 'yes') return;
+      S.data = d; markDirty('Restore from backup'); render();
+    });
+  }
+});
+document.addEventListener('submit', async e => {
+  if (e.target.id !== 'cfgForm') return;
+  e.preventDefault();
+  const c = formCfg();
+  localStorage.setItem(LS_CFG, JSON.stringify(c));
+  S.loadError = '';
+  // carry any local-only edits into the first sync
+  const draft = S.dirty ? { data: S.data, baseSha: S.sha, dirty: true, changes: [...S.changes] } : null;
+  await loadRemote({ draft });
+  updateSyncUI();
+});
+/* drag & drop on the board */
+document.addEventListener('dragstart', e => {
+  const c = e.target.closest && e.target.closest('.pcard'); if (!c) return;
+  e.dataTransfer.setData('text/plain', c.dataset.id); e.dataTransfer.effectAllowed = 'move'; c.classList.add('dragging');
+});
+document.addEventListener('dragend', e => { const c = e.target.closest && e.target.closest('.pcard'); if (c) c.classList.remove('dragging'); $$('.col.over').forEach(x => x.classList.remove('over')); });
+document.addEventListener('dragover', e => { const col = e.target.closest && e.target.closest('[data-drop]'); if (!col) return; e.preventDefault(); $$('.col.over').forEach(x => x !== col && x.classList.remove('over')); col.classList.add('over'); });
+document.addEventListener('drop', e => {
+  const col = e.target.closest && e.target.closest('[data-drop]'); if (!col) return;
+  e.preventDefault(); const id = e.dataTransfer.getData('text/plain');
+  setStatus(getP(id), col.dataset.drop); render();
+});
+document.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save(); } });
+window.addEventListener('beforeunload', e => { if (S.dirty && gh.ready()) { e.preventDefault(); e.returnValue = ''; } });
+window.addEventListener('hashchange', () => { render(); if (!location.hash.includes('#angle-')) window.scrollTo(0, 0); });
+document.addEventListener('visibilitychange', () => {
+  // pick up changes made on another device when you come back to the tab
+  if (document.visibilityState === 'visible' && gh.ready() && !S.dirty && !S.saving && Date.now() - S.lastLoad > 60000) loadRemote({ silent: true });
+});
+$('#saveBtn').addEventListener('click', save);
+$('#reloadBtn').addEventListener('click', async () => {
+  if (S.dirty) {
+    const k = await choose('Reload from GitHub?', 'You have unsaved changes. Reloading will discard them.', [{ k: 'no', label: 'Cancel' }, { k: 'yes', label: 'Discard & reload', danger: true, primary: true }]);
+    if (k !== 'yes') return;
+    S.dirty = false; S.changes.clear();
+  }
+  loadRemote();
+});
+
+/* ---------------- boot ---------------- */
+(async function boot() {
+  const draft = readDraft();
+  if (!gh.ready()) {
+    S.data = normalize(draft && draft.data);
+    S.dirty = !!(draft && draft.dirty); S.changes = new Set((draft && draft.changes) || []);
+    render(); updateSyncUI();
+    return;
+  }
+  updateSyncUI();
+  await loadRemote({ draft });
+})();
+</script>
+</body>
+</html>
