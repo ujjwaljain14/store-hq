@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -304,28 +304,123 @@ select.in.sel{width:auto;padding:6px 30px 6px 10px}
 .loading{padding:60px;text-align:center;color:var(--mute)}
 
 /* ---------- responsive ---------- */
+.stagetabs,.fab,.mlogo{display:none}
 @media (max-width:1150px){.grid2{grid-template-columns:1fr}}
 @media (max-width:960px){.board{grid-template-columns:1fr}.hbc{grid-template-columns:1fr}.calc{grid-template-columns:1fr}}
+
+/* phone & small tablet: app-style layout */
 @media (max-width:860px){
+  :root{--top:52px}
   .app{grid-template-columns:1fr}
-  .side{position:static;height:auto;flex-direction:row;align-items:center;padding:8px 12px;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto}
-  .brand{padding:0 8px 0 0}.brand span:last-child{display:none}
-  .nav{flex-direction:row}.nav a{padding:7px 10px}
-  .side-sec,.stagelist,.side-foot{display:none}
-  .phead{position:static}
-  .aitem{scroll-margin-top:70px}
-}
-@media (max-width:600px){
-  main{padding:14px}.top{padding:0 14px}.phead{margin:-14px -14px 16px;padding:12px 14px 0}
-  .nav a span{display:none}
+  /* sidebar becomes a bottom tab bar */
+  .side{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;z-index:40;flex-direction:row;align-items:stretch;gap:0;
+    padding:4px 6px calc(4px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--line);
+    background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px)}
+  .brand,.side-sec,.stagelist,.side-foot{display:none}
+  .nav{flex-direction:row;flex:1;gap:0}
+  .nav a{flex:1;flex-direction:column;gap:2px;padding:6px 2px 4px;font-size:10.5px;font-weight:600;color:var(--mute);border-radius:10px}
+  .nav a svg{width:23px;height:23px}
+  .nav a.on{background:transparent;color:var(--acc)}
+  .nav a:hover{background:transparent}
+  .mainc{padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+  /* compact top bar */
+  .top{height:calc(var(--top) + env(safe-area-inset-top));padding:env(safe-area-inset-top) 14px 0;gap:8px}
+  .mlogo{display:grid;width:26px;height:26px;border-radius:8px;font-size:12px}
+  #pageTitle{font-size:16px}
   #syncStatus span{display:none}
+  #saveBtn{padding:7px 16px}
+  main{padding:14px 14px 84px}
+  #toast{bottom:calc(76px + env(safe-area-inset-bottom));width:calc(100% - 32px)}
+  .t{text-align:center}
+  /* inputs >=16px so iPhone doesn't zoom on focus */
+  .in,select.in,textarea.in{font-size:16px}
+  .title-in{font-size:20px}
+  .tagadd input{font-size:16px;width:150px}
+  /* bigger tap targets */
+  .iconbtn{width:36px;height:36px}
+  .btn.sm{padding:6px 11px}
+  .chip{padding:5px 12px;font-size:12.5px}
+  .hide-touch{display:none}
+  /* floating add button */
+  .fab{display:grid;place-items:center;position:fixed;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:35;width:54px;height:54px;border-radius:18px;border:0;
+    background:var(--acc);color:var(--acc-ink);box-shadow:0 8px 24px rgba(79,70,229,.4)}
+  .fab svg{width:24px;height:24px}
+  /* board: one stage at a time */
+  .toolbar{gap:8px}
+  .toolbar .search{flex:1 1 100%}
+  .toolbar select.in.sel{flex:1;width:100%}
+  .toolbar .add-btn{display:none}
+  .stagetabs{display:flex;position:sticky;top:calc(var(--top) + env(safe-area-inset-top));z-index:15;gap:4px;padding:4px;margin:0 0 12px;
+    background:var(--soft);border:1px solid var(--line);border-radius:12px;box-shadow:0 4px 12px rgba(16,24,40,.06)}
+  .stagetabs button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border:0;background:transparent;padding:8px 4px;border-radius:9px;font-weight:650;color:var(--mute);font-size:13.5px}
+  .stagetabs button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(16,24,40,.12)}
+  .stagetabs .count{margin-left:0}
+  .board{display:block}
+  .board .col{display:none;background:transparent;border:0;padding:0;min-height:0}
+  .board[data-show="pipeline"] .col[data-drop="pipeline"],.board[data-show="live"] .col[data-drop="live"],.board[data-show="stopped"] .col[data-drop="stopped"]{display:block}
+  .board .col-h{display:none}
+  .pcard{padding:13px 14px 11px 16px;margin-bottom:10px}
+  .pc-move{opacity:1;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+  .pc-move .iconbtn{width:32px;height:32px}
+  .pc-move .iconbtn svg{width:15px;height:15px}
+  .lnk{padding:6px 11px;font-size:12.5px}
+  /* product page */
+  .phead{position:static;margin:-14px -14px 14px;padding:12px 14px 0}
+  .ph-row{gap:8px}
+  .ph-row .seg{order:5;flex:1 1 100%;display:flex}
+  .ph-row .seg button{flex:1;justify-content:center;padding:8px 6px}
+  .tabs a{flex:1;justify-content:center}
+  .aitem{scroll-margin-top:70px}
+  .tiles{grid-template-columns:1fr 1fr;gap:10px}
+  .tile{padding:12px 13px}.tile b{font-size:20px}
+  .card{padding:16px}
+  .kstrip{grid-template-columns:repeat(3,1fr)}
+  .kstrip div{padding:9px 11px}.kstrip b{font-size:15px}
+}
+
+@media (max-width:640px){
   .kpis{grid-template-columns:1fr 1fr}
   .pages .pg{grid-template-columns:1fr auto auto}.pages .pg input:first-child{grid-column:1/-1}
+  .hide-sm,.tabs .hide-sm{display:none}
+  .tabs-right .btn span{display:none}
+  /* angles */
   .ahead{flex-wrap:wrap}.aright{flex-direction:row;width:100%;justify-content:flex-start;padding-left:46px}
   .aitem:not(.open) .ahead{padding-right:40px}
   .aitem:not(.open) .chev{position:absolute;right:10px;top:12px}
-  .hide-sm{display:none}
-  .tabs-right .btn span{display:none}
+  .aitem.open .ahead{gap:8px}
+  .aitem.open .ahead .anum{order:0}
+  .aitem.open .ahead .angle-title{order:1;flex:1 1 calc(100% - 90px);min-width:0}
+  .aitem.open .ahead .chev{order:2;width:32px;height:32px}
+  .aitem.open .ahead .pill-select{order:3}
+  .aitem.open .ahead .acts{order:4;margin-left:auto}
+  .aitem.open .ahead .acts .iconbtn{width:34px;height:34px}
+  .abody{padding:12px}
+  .perf{padding:12px}
+  .perf-h{display:grid;grid-template-columns:1fr auto;gap:6px 10px}
+  .perf-h .tot{grid-column:1/-1;order:3}
+  /* data tables become stacked cards */
+  .wrap{overflow:visible;margin:0}
+  .data thead{display:none}
+  .data,.data tbody,.data tfoot{display:block}
+  .data tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 10px;padding:12px 2px;border-bottom:1px solid var(--line)}
+  .data tbody tr:hover{background:transparent}
+  .data td{display:flex;flex-direction:column;align-items:flex-start;gap:1px;border:0;padding:0;text-align:left!important;white-space:normal;min-width:0}
+  .data td::before{content:attr(data-label);font-size:10px;font-weight:650;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+  .data td:first-child{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px;font-size:15px}
+  .data td:first-child::before{display:none}
+  .data td:empty{display:none}
+  .data tfoot tr{border-bottom:0;background:var(--soft);border-radius:10px;padding:12px}
+  .data .bar{display:none}
+  /* daily log rows become compact grids */
+  .log thead{display:none}
+  .log,.log tbody{display:block}
+  .log tr{display:grid;grid-template-columns:1.35fr 1fr .8fr 36px;grid-template-areas:"d s o x" "n n n n";gap:6px;padding:8px 0;border-bottom:1px dashed var(--line2);align-items:end}
+  .log td{padding:0;min-width:0}
+  .log td::before{content:attr(data-label);display:block;font-size:10px;font-weight:650;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);margin-bottom:2px}
+  .log td:nth-child(1){grid-area:d}.log td:nth-child(2){grid-area:s}.log td:nth-child(3){grid-area:o}.log td:nth-child(4){grid-area:n}.log td:nth-child(5){grid-area:x}
+  .log td:nth-child(4)::before,.log td:nth-child(5)::before{display:none}
+  .log .in{padding:7px 8px}
+  .quickadd .btn{display:none}
 }
 </style>
 </head>
@@ -345,7 +440,7 @@ select.in.sel{width:auto;padding:6px 30px 6px 10px}
   </aside>
   <div class="mainc">
     <header class="top">
-      <div id="pageTitle"></div>
+      <span class="logo mlogo">S</span><div id="pageTitle"></div>
       <span id="syncStatus"></span>
       <button id="reloadBtn" class="iconbtn" title="Reload latest from GitHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></svg></button>
       <button id="saveBtn" class="btn primary" title="Save to GitHub (Ctrl/Cmd+S)">Save</button>
@@ -384,7 +479,7 @@ const tagChip = t => `<span class="ptag" style="--h:${tagHue(t)}">${esc(t)}</spa
 
 const S = {
   data: null, sha: null, dirty: false, changes: new Set(), saving: false, loadError: '', lastLoad: 0,
-  boardQ: '', boardTag: '', openAngles: new Set(), angleFilter: 'All',
+  boardQ: '', boardTag: '', boardStage: 'pipeline', openAngles: new Set(), angleFilter: 'All',
 };
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -897,15 +992,17 @@ function viewBoard() {
   <div class="toolbar">
     <div class="search">${I.search}<input id="boardSearch" class="in" placeholder="Search products…" value="${esc(S.boardQ)}"></div>
     ${S.data.settings.tags.length ? `<select id="boardTag" class="in sel" title="Filter by tag"><option value="">All tags</option>${S.data.settings.tags.map(t => `<option value="${esc(t.toLowerCase())}" ${S.boardTag === t.toLowerCase() ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>` : ''}
-    <span class="mute" style="font-size:12.5px">Drag cards to reorder or change stage</span>
-    <button class="btn primary" style="margin-left:auto" data-act="add-product">${I.plus}Add product</button>
+    <span class="mute hide-touch" style="font-size:12.5px">Drag cards to reorder or change stage</span>
+    <button class="btn primary add-btn" style="margin-left:auto" data-act="add-product">${I.plus}Add product</button>
   </div>
-  <div class="board">${STAGES.map(s => {
+  <div class="stagetabs">${STAGES.map(s => `<button class="${S.boardStage === s.key ? 'on' : ''}" data-act="board-stage" data-stage="${s.key}"><i class="dot ${s.key}"></i>${s.label}<span class="count">${S.data.products.filter(p => p.status === s.key).length}</span></button>`).join('')}</div>
+  <button class="fab" data-act="add-product" title="Add product" aria-label="Add product">${I.plus}</button>
+  <div class="board" data-show="${S.boardStage}">${STAGES.map(s => {
     const items = colItems(s.key);
     return `<div class="col" data-drop="${s.key}">
       <div class="col-h"><span class="dot ${s.key}"></span>${s.label}<span class="count">${items.length}</span>
         ${s.key === 'pipeline' ? `<button class="iconbtn" title="Add product" data-act="add-product">${I.plus}</button>` : ''}</div>
-      <div class="col-b">${items.map(cardHTML).join('') || `<div class="col-empty">${s.key === 'pipeline' ? 'Add products you want to test' : 'Drag products here'}</div>`}</div>
+      <div class="col-b">${items.map(cardHTML).join('') || `<div class="col-empty">${s.key === 'pipeline' ? 'Add products you want to test' : `No ${s.label.toLowerCase()} products`}</div>`}</div>
     </div>`;
   }).join('')}</div>`;
 }
@@ -1051,8 +1148,8 @@ function angleItem(p, a, i) {
         ${a.log.length ? `<table class="log"><thead><tr><th style="width:150px">Date</th><th style="width:130px">Spend ₹</th><th style="width:100px">Orders</th><th>Note</th><th style="width:34px"></th></tr></thead>
         <tbody>${a.log.map(l => { const ls = `l:${p.id}:${a.id}:${l.id}`; return `<tr>
           <td>${inp(ls, 'date', l.date, { type: 'date' })}</td>
-          <td>${inp(ls, 'spend', l.spend, { type: 'num', ph: '0' })}</td>
-          <td>${inp(ls, 'orders', l.orders, { type: 'num', ph: '0' })}</td>
+          <td>${inp(ls, 'spend', l.spend, { type: 'num', ph: '₹ spend' })}</td>
+          <td>${inp(ls, 'orders', l.orders, { type: 'num', ph: 'orders' })}</td>
           <td>${inp(ls, 'note', l.note, { ph: 'Budget change, creative swap…' })}</td>
           <td><button class="iconbtn del" title="Remove row" data-act="del-log" data-id="${p.id}" data-angle="${a.id}" data-log="${l.id}">${I.x}</button></td></tr>`; }).join('')}</tbody></table>` : ''}
       </div>
@@ -1071,8 +1168,9 @@ function tabAngles(p) {
   <div class="alist">
     ${list.map(({ a, i }) => angleItem(p, a, i)).join('') || (p.angles.length ? `<div class="empty">No ${esc(f)} angles.</div>` : `<div class="empty"><b>No angles yet</b>Each angle gets a title, ideation, and hook / body / CTA.<br><button class="btn primary" data-act="add-angle" data-id="${p.id}">${I.plus}New angle</button></div>`)}
   </div>
+  <button class="fab" data-act="add-angle" data-id="${p.id}" title="New angle" aria-label="New angle">${I.plus}</button>
   <form class="quickadd" data-quickadd="${p.id}">
-    <input class="in" id="quickAngle" placeholder="Quick add: type an angle title and press Enter…" autocomplete="off">
+    <input class="in" id="quickAngle" placeholder="Quick add angle title…" autocomplete="off" enterkeyhint="done">
     <button class="btn sm" type="submit">${I.plus}Add</button>
   </form>`;
 }
@@ -1146,7 +1244,7 @@ function viewProduct(id, tab) {
         ${p.angles.length ? `<button class="btn ghost sm" data-act="expand-all" data-id="${p.id}" title="Open all">${I.expand}<span>Expand all</span></button>
         <button class="btn ghost sm" data-act="collapse-all" title="Close all">${I.collapse}<span>Collapse all</span></button>` : ''}
         <button class="btn primary sm" data-act="add-angle" data-id="${p.id}">${I.plus}<span>New angle</span></button>`
-        : `<a class="btn sm" href="#/p/${p.id}/angles" style="text-decoration:none">${p.angles.length} angle${p.angles.length === 1 ? '' : 's'} →</a>`}
+        : `<a class="btn sm hide-sm" href="#/p/${p.id}/angles" style="text-decoration:none">${p.angles.length} angle${p.angles.length === 1 ? '' : 's'} →</a>`}
       </div>
     </div>
   </div>
@@ -1256,6 +1354,12 @@ function renderSide() {
   const ps = S.data ? S.data.products : [];
   $('#stagelist').innerHTML = STAGES.map(s => `<a href="#/board"><span class="dot ${s.key}"></span>${s.label}<b>${ps.filter(p => p.status === s.key).length}</b></a>`).join('');
 }
+function labelTables(root) {
+  $$('table.data, table.log', root).forEach(t => {
+    const hs = $$('thead th', t).map(th => th.textContent.trim());
+    $$('tbody tr, tfoot tr', t).forEach(tr => [...tr.children].forEach((td, i) => td.setAttribute('data-label', hs[i] || '')));
+  });
+}
 function render() {
   const view = $('#view');
   if (!S.data) { view.innerHTML = '<div class="loading">Loading…</div>'; return; }
@@ -1275,6 +1379,7 @@ function render() {
   document.title = title.replace('Products / ', '') + ' · Store HQ';
   renderSide();
   $$('textarea.grow', view).forEach(autoGrow);
+  labelTables(view);
   if (r === 'board' && (S.boardQ || S.boardTag)) filterBoard();
 }
 function updateDerived() {
@@ -1325,7 +1430,11 @@ const actions = {
     location.hash = '#/p/' + p.id;
     setTimeout(() => { const t = $('.title-in'); if (t) t.focus(); }, 60);
   },
-  'move'(el) { setStatus(getP(el.dataset.id), el.dataset.to); render(); },
+  'move'(el) {
+    const p = getP(el.dataset.id); setStatus(p, el.dataset.to); render();
+    if (route().r === 'board') toast(`Moved “${p.name || 'product'}” to ${STAGES.find(s => s.key === el.dataset.to).label}`);
+  },
+  'board-stage'(el) { S.boardStage = el.dataset.stage; render(); window.scrollTo(0, 0); },
   'reorder'(el) {
     const p = getP(el.dataset.id); const col = colItems(p.status); const i = col.indexOf(p);
     const d = el.dataset.dir; const j = d === 'top' ? 0 : i + Number(d);
