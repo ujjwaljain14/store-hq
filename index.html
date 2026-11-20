@@ -179,6 +179,12 @@ a.tile{color:inherit}a.tile:hover{text-decoration:none;border-color:var(--line2)
 .pc-move .iconbtn svg{width:13px;height:13px}
 .pc-move .sp{flex:1}
 .pc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.pc-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.lnk{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:3px 9px;border-radius:7px;border:1px solid var(--line2);background:var(--panel);color:var(--ink2);font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lnk svg{width:12px;height:12px;color:var(--mute)}
+.lnk:hover{text-decoration:none;border-color:var(--acc);color:var(--acc)}
+.lnk:hover svg{color:var(--acc)}
+.lnk.listing{background:var(--soft)}
 .budget{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:6px;background:var(--acc-soft);color:var(--acc);font-weight:650;font-size:12px}
 .budget svg{width:12px;height:12px}
 .ptag{--h:220;display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:650;white-space:nowrap;border:1px solid transparent;color:hsl(var(--h) 55% 38%);background:hsl(var(--h) 85% 95%)}
@@ -850,6 +856,7 @@ function cardHTML(p) {
       <div style="min-width:0"><div class="pc-name">${esc(p.name || 'Untitled')}</div>
       <div class="pc-sub">${num(p.sellingPrice) ? inr(num(p.sellingPrice)) : 'No price'} · ${p.angles.length} angle${p.angles.length === 1 ? '' : 's'}</div></div></div>
     ${p.tags.length ? `<div class="pc-tags">${p.tags.map(tagChip).join('')}</div>` : ''}
+    ${cardLinks(p)}
     <div class="pc-stats">${bud}${line}</div>
     <div class="pc-move">
       <button class="iconbtn" title="Move to top" data-act="reorder" data-id="${p.id}" data-dir="top" ${idx === 0 ? 'disabled' : ''}>${I.top}</button>
@@ -859,6 +866,17 @@ function cardHTML(p) {
       ${STAGES.filter(s => s.key !== p.status).map(s => `<button class="chip" data-act="move" data-id="${p.id}" data-to="${s.key}">→ ${s.label}</button>`).join('')}
     </div>
   </div>`;
+}
+function cardLinks(p) {
+  const links = [];
+  const lu = safeUrl(p.listingLink);
+  if (lu) links.push(`<a class="lnk ext-link listing" href="${esc(lu)}" target="_blank" rel="noopener noreferrer" draggable="false" title="Open product listing">${I.ext}Listing</a>`);
+  const pages = (p.pages || []).filter(pg => safeUrl(pg.url));
+  pages.forEach((pg, i) => {
+    const label = (pg.label || '').trim() || (pages.length > 1 ? `Page ${i + 1}` : 'Product page');
+    links.push(`<a class="lnk ext-link" href="${esc(safeUrl(pg.url))}" target="_blank" rel="noopener noreferrer" draggable="false" title="${esc(pg.url)}">${I.ext}${esc(label)}</a>`);
+  });
+  return links.length ? `<div class="pc-links">${links.join('')}</div>` : '';
 }
 function colItems(stage) { return S.data.products.filter(p => p.status === stage).sort((a, b) => num(a.order) - num(b.order)); }
 /* put product p into column `stage` before product `beforeId` (or at `index`), then renumber both columns */
@@ -1441,6 +1459,7 @@ function formCfg() {
 
 /* ---------------- events ---------------- */
 document.addEventListener('click', e => {
+  if (e.target.closest('a.ext-link')) return; // external links on cards open normally in a new tab
   const el = e.target.closest('[data-act]');
   if (!el || el.disabled) return;
   const fn = actions[el.dataset.act]; if (!fn) return;
