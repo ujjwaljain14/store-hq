@@ -9,6 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Store HQ">
 <meta name="theme-color" content="#4f46e5">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236366f1'/%3E%3Cstop offset='1' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M42 21.5c-2.6-2.4-6.2-3.7-10.1-3.7-6.3 0-10.6 3.3-10.6 8.2 0 4.6 3.4 6.6 9.6 8l2.9.7c3.3.8 4.4 1.7 4.4 3.3 0 1.9-2 3.2-5.3 3.2-3.6 0-6.6-1.4-8.8-3.7l-3.6 4.4c2.8 2.9 7.1 4.6 12.1 4.6 7 0 11.4-3.4 11.4-8.6 0-4.6-3-6.9-9.6-8.3l-3-.7c-3-.7-4-1.5-4-2.9 0-1.7 1.8-2.8 4.6-2.8 2.8 0 5.3 1 7.1 2.6z' fill='white'/%3E%3C/svg%3E">
 <title>Store HQ</title>
 <style>
 :root{
@@ -171,6 +172,28 @@ a.tile{color:inherit}a.tile:hover{text-decoration:none;border-color:var(--line2)
 .chip:hover{color:var(--acc);border-color:var(--acc)}
 .chip.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
 
+.pcard.drop-before::after{content:"";position:absolute;left:6px;right:6px;top:-6px;height:3px;border-radius:2px;background:var(--acc)}
+.col-b.drop-end::after{content:"";display:block;height:3px;border-radius:2px;background:var(--acc);margin:2px 6px 8px}
+.pc-move .iconbtn{width:24px;height:24px;border:1px solid var(--line2);background:var(--panel)}
+.pc-move .iconbtn:disabled{opacity:.35;cursor:default}
+.pc-move .iconbtn svg{width:13px;height:13px}
+.pc-move .sp{flex:1}
+.pc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.budget{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:6px;background:var(--acc-soft);color:var(--acc);font-weight:650;font-size:12px}
+.budget svg{width:12px;height:12px}
+.ptag{--h:220;display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:650;white-space:nowrap;border:1px solid transparent;color:hsl(var(--h) 55% 38%);background:hsl(var(--h) 85% 95%)}
+@media (prefers-color-scheme:dark){.ptag{color:hsl(var(--h) 75% 78%);background:hsl(var(--h) 35% 19%)}}
+button.ptag{cursor:pointer;font-family:inherit}
+.ptag.pick:not(.on){background:transparent;color:var(--mute);border:1px dashed var(--line2)}
+.ptag.pick:not(.on):hover{color:var(--ink);border-color:var(--mute)}
+.ptag.pick.on::before{content:"✓";font-size:10px}
+.tagpick{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tagadd{display:inline-flex}
+.tagadd input{width:140px;padding:3px 10px;border-radius:20px;font-size:12px}
+.taglist{display:flex;flex-wrap:wrap;gap:8px}
+.taglist .ptag button{border:0;background:transparent;color:inherit;padding:0;margin-left:2px;opacity:.6;font-size:14px;line-height:1}
+.taglist .ptag button:hover{opacity:1}
+select.in.sel{width:auto;padding:6px 30px 6px 10px}
 /* ---------- product page ---------- */
 .phead{position:sticky;top:var(--top);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);margin:-24px -24px 20px;padding:14px 24px 0;border-bottom:1px solid var(--line)}
 .ph-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
@@ -343,10 +366,19 @@ const STAGES = [
   { key: 'stopped', label: 'Stopped' },
 ];
 const ANGLE_STATUS = ['Idea', 'Testing', 'Winning', 'Paused', 'Killed'];
+const DEFAULT_TAGS = ['Problem solving', 'Wow factor', 'Scroll stopper'];
+const TAG_HUES = { 'problem solving': 210, 'wow factor': 275, 'scroll stopper': 335 };
+function tagHue(t) {
+  const k = String(t).toLowerCase();
+  if (TAG_HUES[k] != null) return TAG_HUES[k];
+  let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return [25, 160, 190, 45, 120, 300, 0, 95][h % 8];
+}
+const tagChip = t => `<span class="ptag" style="--h:${tagHue(t)}">${esc(t)}</span>`;
 
 const S = {
   data: null, sha: null, dirty: false, changes: new Set(), saving: false, loadError: '', lastLoad: 0,
-  boardQ: '', openAngles: new Set(), angleFilter: 'All',
+  boardQ: '', boardTag: '', openAngles: new Set(), angleFilter: 'All',
 };
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -367,6 +399,8 @@ const I = {
   expand: ic('<path d="m7 15 5 5 5-5M7 9l5-5 5 5"/>'),
   collapse: ic('<path d="m7 20 5-5 5 5M7 4l5 5 5-5"/>'),
   back: ic('<path d="M19 12H5M12 19l-7-7 7-7"/>'),
+  top: ic('<path d="M5 4h14M12 20V9M7 13l5-5 5 5"/>'),
+  wallet: ic('<path d="M20 7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15V7"/><path d="M16 14h.01"/>'),
 };
 
 /* ---------------- utils ---------------- */
@@ -394,7 +428,7 @@ const pn = v => v >= 0 ? 'pos' : 'negv';
 function defaultDefaults() {
   return { mode: 'aggregator', orders: 1000, cac: null, deliveryPct: 35, rto: 65, shipping: 0, shippingBasis: 'all', packaging: 0 };
 }
-function emptyData() { return { version: 1, settings: { defaults: defaultDefaults() }, products: [], scratch: exampleCalc() }; }
+function emptyData() { return { version: 1, settings: { defaults: defaultDefaults(), tags: DEFAULT_TAGS.slice() }, products: [], scratch: exampleCalc() }; }
 function calcFrom(d) {
   return { mode: d.mode, aov: null, orders: d.orders, cac: d.cac, deliveryPct: d.deliveryPct, cogs: null, shipping: d.shipping, shippingBasis: d.shippingBasis, rto: d.rto, packaging: d.packaging };
 }
@@ -420,6 +454,15 @@ function normalize(d) {
       for (const l of a.log) l.id = l.id || uid();
     }
     for (const pg of p.pages) pg.id = pg.id || uid();
+    p.tags = Array.isArray(p.tags) ? p.tags.filter(t => typeof t === 'string' && t.trim()) : [];
+  }
+  if (!Array.isArray(d.settings.tags)) d.settings.tags = DEFAULT_TAGS.slice();
+  for (const p of d.products) for (const t of p.tags) if (!d.settings.tags.includes(t)) d.settings.tags.push(t);
+  // manual order inside each column (older data without an order: newest first)
+  for (const s of STAGES) {
+    d.products.filter(p => p.status === s.key)
+      .sort((a, b) => ((has(a.order) ? a.order : 1e9) - (has(b.order) ? b.order : 1e9)) || stageSortKey(b).localeCompare(stageSortKey(a)))
+      .forEach((p, i) => { p.order = i; });
   }
   d.scratch = Object.assign(exampleCalc(), d.scratch || {});
   return d;
@@ -753,6 +796,7 @@ function viewDashboard() {
     <a class="tile" href="#/board"><span><i class="dot pipeline"></i>Pipeline</span><b>${by('pipeline').length}</b><small>products to test</small></a>
     <a class="tile" href="#/board"><span><i class="dot live"></i>Live</span><b>${live.length}</b><small>running now</small></a>
     <a class="tile" href="#/board"><span><i class="dot stopped"></i>Stopped</span><b>${by('stopped').length}</b><small>paused or killed</small></a>
+    <div class="tile"><span>Live daily budget</span><b>${inr(live.reduce((s, p) => s + num(p.dailyBudget), 0))}</b><small>per day across ${live.length} product${live.length === 1 ? '' : 's'}</small></div>
     <div class="tile"><span>Live ad spend</span><b>${inr(ls)}</b><small>All-time ${inr(allSpend)}</small></div>
     <div class="tile"><span>Live orders</span><b>${n0(lo)}</b><small>Blended CPA ${inr(lo ? ls / lo : NaN)}</small></div>
     <div class="tile"><span>Live est. profit</span><b class="${pn(ln)}">${inr(ln)}</b><small>ROI ${pct(ls ? ln / ls : NaN, 1)}</small></div>
@@ -761,9 +805,9 @@ function viewDashboard() {
   <section class="card">
     <div class="card-h"><h3>Live products</h3><a href="#/board">All products →</a></div>
     ${liveRows.length ? `<div class="wrap"><table class="data">
-      <thead><tr><th>Product</th><th>Spend</th><th>Orders</th><th>CPA</th><th>ROAS</th><th>Est. profit</th><th>ROI</th><th class="l">Best angle</th></tr></thead>
+      <thead><tr><th>Product</th><th>Budget/day</th><th>Spend</th><th>Orders</th><th>CPA</th><th>ROAS</th><th>Est. profit</th><th>ROI</th><th class="l">Best angle</th></tr></thead>
       <tbody>${liveRows.map(({ p, st, best }) => `<tr data-act="open" data-id="${p.id}">
-        <td><b>${esc(p.name || 'Untitled')}</b></td><td>${inr(st.spend)}</td><td>${n0(st.orders)}</td><td>${inr(st.cpa)}</td><td>${xx(st.roas)}</td>
+        <td><b>${esc(p.name || 'Untitled')}</b>${p.tags.length ? ' ' + p.tags.map(tagChip).join(' ') : ''}</td><td>${num(p.dailyBudget) ? inr(num(p.dailyBudget)) : '<span class="mute">—</span>'}</td><td>${inr(st.spend)}</td><td>${n0(st.orders)}</td><td>${inr(st.cpa)}</td><td>${xx(st.roas)}</td>
         <td class="${pn(st.net)}">${inr(st.net)}</td><td><span class="badge ${st.spend ? pn(st.roi) : ''}">${pct(st.roi, 1)}</span></td>
         <td class="l">${best ? esc(best.a.title || 'Untitled angle') + ` <span class="mute">(${pct(best.s.roi, 0)})</span>` : '<span class="mute">—</span>'}</td></tr>`).join('')}</tbody>
     </table></div>` : `<p class="hint" style="margin:0">No live products yet. Move a product from Pipeline to Live on the <a href="#/board">board</a>.</p>`}
@@ -799,13 +843,34 @@ function cardHTML(p) {
     line = `<span>${inr(st.spend)} spent</span><span>ROAS ${xx(st.roas)}</span><span class="badge ${pn(st.net)}">${inr(st.net)}</span>`;
   } else line = '<span class="mute">No spend logged</span>';
   const img = safeUrl(p.image);
-  return `<div class="pcard ${p.status}" draggable="true" data-act="open" data-id="${p.id}" data-name="${esc((p.name || '').toLowerCase())}">
+  const bud = num(p.dailyBudget) && p.status !== 'stopped' ? `<span class="budget" title="Daily budget">${I.wallet}${inr(num(p.dailyBudget))}/day</span>` : '';
+  const col = colItems(p.status); const idx = col.indexOf(p);
+  return `<div class="pcard ${p.status}" draggable="true" data-act="open" data-id="${p.id}" data-name="${esc((p.name || '').toLowerCase())}" data-tags="${esc(p.tags.map(t => t.toLowerCase()).join('|'))}">
     <div class="pc-top">${img ? `<img class="thumb" src="${esc(img)}" alt="" loading="lazy">` : `<div class="thumb ph">${esc((p.name || '?').trim()[0] || '?')}</div>`}
       <div style="min-width:0"><div class="pc-name">${esc(p.name || 'Untitled')}</div>
       <div class="pc-sub">${num(p.sellingPrice) ? inr(num(p.sellingPrice)) : 'No price'} · ${p.angles.length} angle${p.angles.length === 1 ? '' : 's'}</div></div></div>
-    <div class="pc-stats">${line}</div>
-    <div class="pc-move">${STAGES.filter(s => s.key !== p.status).map(s => `<button class="chip" data-act="move" data-id="${p.id}" data-to="${s.key}">→ ${s.label}</button>`).join('')}</div>
+    ${p.tags.length ? `<div class="pc-tags">${p.tags.map(tagChip).join('')}</div>` : ''}
+    <div class="pc-stats">${bud}${line}</div>
+    <div class="pc-move">
+      <button class="iconbtn" title="Move to top" data-act="reorder" data-id="${p.id}" data-dir="top" ${idx === 0 ? 'disabled' : ''}>${I.top}</button>
+      <button class="iconbtn" title="Move up" data-act="reorder" data-id="${p.id}" data-dir="-1" ${idx === 0 ? 'disabled' : ''}>${I.up}</button>
+      <button class="iconbtn" title="Move down" data-act="reorder" data-id="${p.id}" data-dir="1" ${idx === col.length - 1 ? 'disabled' : ''}>${I.down}</button>
+      <span class="sp"></span>
+      ${STAGES.filter(s => s.key !== p.status).map(s => `<button class="chip" data-act="move" data-id="${p.id}" data-to="${s.key}">→ ${s.label}</button>`).join('')}
+    </div>
   </div>`;
+}
+function colItems(stage) { return S.data.products.filter(p => p.status === stage).sort((a, b) => num(a.order) - num(b.order)); }
+/* put product p into column `stage` before product `beforeId` (or at `index`), then renumber both columns */
+function placeProduct(p, stage, { beforeId = null, index = null } = {}) {
+  const from = p.status;
+  const items = colItems(stage).filter(x => x !== p);
+  let i = index != null ? index : beforeId ? items.findIndex(x => x.id === beforeId) : items.length;
+  if (i < 0 || i > items.length) i = items.length;
+  items.splice(i, 0, p);
+  p.status = stage;
+  items.forEach((x, k) => { x.order = k; });
+  if (from !== stage) colItems(from).forEach((x, k) => { x.order = k; });
 }
 function stageSortKey(p) { return p.status === 'live' ? (p.liveAt || '') : p.status === 'stopped' ? (p.stoppedAt || '') : (p.createdAt || ''); }
 
@@ -813,11 +878,12 @@ function viewBoard() {
   return banner() + `
   <div class="toolbar">
     <div class="search">${I.search}<input id="boardSearch" class="in" placeholder="Search products…" value="${esc(S.boardQ)}"></div>
-    <span class="mute" style="font-size:12.5px">Drag cards between columns to change stage</span>
+    ${S.data.settings.tags.length ? `<select id="boardTag" class="in sel" title="Filter by tag"><option value="">All tags</option>${S.data.settings.tags.map(t => `<option value="${esc(t.toLowerCase())}" ${S.boardTag === t.toLowerCase() ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>` : ''}
+    <span class="mute" style="font-size:12.5px">Drag cards to reorder or change stage</span>
     <button class="btn primary" style="margin-left:auto" data-act="add-product">${I.plus}Add product</button>
   </div>
   <div class="board">${STAGES.map(s => {
-    const items = S.data.products.filter(p => p.status === s.key).sort((a, b) => stageSortKey(b).localeCompare(stageSortKey(a)));
+    const items = colItems(s.key);
     return `<div class="col" data-drop="${s.key}">
       <div class="col-h"><span class="dot ${s.key}"></span>${s.label}<span class="count">${items.length}</span>
         ${s.key === 'pipeline' ? `<button class="iconbtn" title="Add product" data-act="add-product">${I.plus}</button>` : ''}</div>
@@ -1007,11 +1073,17 @@ function tabOverview(p) {
   <div class="grid2">
     <section class="card">
       <h3>Product details</h3>
+      <div class="f"><span>Tags</span>
+        <div class="tagpick">${S.data.settings.tags.map(t => `<button class="ptag pick ${p.tags.includes(t) ? 'on' : ''}" style="--h:${tagHue(t)}" data-act="toggle-tag" data-id="${p.id}" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}
+          <form class="tagadd" data-tagadd="${p.id}" autocomplete="off"><input class="in" placeholder="+ Custom tag" maxlength="30"></form>
+        </div>
+      </div>
       ${fld('Product listing link', `<div class="ig">${inp(sc, 'listingLink', p.listingLink, { type: 'url', ph: 'https://…' })}<button class="iconbtn bordered" title="Open" data-act="open-link" data-src="listingLink">${I.ext}</button></div>`)}
       <div class="two">
         ${fld('Listing price', `<div class="ig">${inp(sc, 'listingPrice', p.listingPrice, { type: 'num', ph: '0' })}<em>₹</em></div>`)}
         ${fld('Selling price', `<div class="ig">${inp(sc, 'sellingPrice', p.sellingPrice, { type: 'num', ph: '0' })}<em>₹</em></div>`)}
       </div>
+      ${fld('Daily budget', `<div class="ig">${inp(sc, 'dailyBudget', p.dailyBudget, { type: 'num', ph: 'Ad budget set per day' })}<em>₹/day</em></div>`)}
       <div class="f"><span>Product pages</span>
         <div class="pages">${p.pages.map(pg => `<div class="pg">
           ${inp(`pg:${p.id}:${pg.id}`, 'label', pg.label, { ph: 'Label' })}
@@ -1043,7 +1115,8 @@ function viewProduct(id, tab) {
       ${img ? `<img class="thumb lg" src="${esc(img)}" alt="">` : ''}
       <div style="flex:1;min-width:200px">
         <input class="title-in" style="width:100%" data-scope="p:${p.id}" data-key="name" value="${esc(p.name)}" placeholder="Product name">
-        <div class="meta">Added ${esc(p.createdAt || '—')}${p.liveAt ? ` · Went live ${esc(p.liveAt)}` : ''}${p.status === 'stopped' && p.stoppedAt ? ` · Stopped ${esc(p.stoppedAt)}` : ''}</div>
+        <div class="meta">Added ${esc(p.createdAt || '—')}${p.liveAt ? ` · Went live ${esc(p.liveAt)}` : ''}${p.status === 'stopped' && p.stoppedAt ? ` · Stopped ${esc(p.stoppedAt)}` : ''}${num(p.dailyBudget) && p.status !== 'stopped' ? ` · Budget ${inr(num(p.dailyBudget))}/day` : ''}</div>
+        ${p.tags.length ? `<div class="pc-tags" style="margin-top:4px">${p.tags.map(tagChip).join('')}</div>` : ''}
       </div>
       <div class="seg">${STAGES.map(s => `<button class="${p.status === s.key ? 'on' : ''}" data-act="move" data-id="${p.id}" data-to="${s.key}"><i class="dot ${s.key}"></i>${s.label}</button>`).join('')}</div>
       <button class="iconbtn del" title="Delete product" data-act="del-product" data-id="${p.id}">${I.trash}</button>
@@ -1121,6 +1194,14 @@ function viewSettings() {
   </section>
 
   <section class="card narrow">
+    <h3>Product tags</h3>
+    <p class="hint">Tags you can put on products. They show on the board cards and you can filter the board by them.</p>
+    <div class="taglist">${S.data.settings.tags.map(t => `<span class="ptag" style="--h:${tagHue(t)}">${esc(t)}<button title="Delete tag" data-act="del-tag" data-tag="${esc(t)}">×</button></span>`).join('') || '<span class="mute">No tags</span>'}
+      <form class="tagadd" data-tagadd="" autocomplete="off"><input class="in" placeholder="+ New tag" maxlength="30"></form>
+    </div>
+  </section>
+
+  <section class="card narrow">
     <h3>Calculator defaults for new products</h3>
     <p class="hint">Used when you add a product. Existing products keep their own numbers.</p>
     <div class="two">
@@ -1176,7 +1257,7 @@ function render() {
   document.title = title.replace('Products / ', '') + ' · Store HQ';
   renderSide();
   $$('textarea.grow', view).forEach(autoGrow);
-  if (r === 'board' && S.boardQ) filterBoard();
+  if (r === 'board' && (S.boardQ || S.boardTag)) filterBoard();
 }
 function updateDerived() {
   $$('[data-derived]').forEach(el => {
@@ -1186,8 +1267,8 @@ function updateDerived() {
   });
 }
 function filterBoard() {
-  const q = S.boardQ.trim().toLowerCase();
-  $$('.pcard').forEach(c => { c.hidden = !!q && !c.dataset.name.includes(q); });
+  const q = S.boardQ.trim().toLowerCase(), t = S.boardTag;
+  $$('.pcard').forEach(c => { c.hidden = (!!q && !c.dataset.name.includes(q)) || (!!t && !c.dataset.tags.split('|').includes(t)); });
 }
 function scrollToAngle(aid, focusSel) {
   requestAnimationFrame(() => {
@@ -1201,7 +1282,7 @@ function scrollToAngle(aid, focusSel) {
 /* ---------------- actions ---------------- */
 function setStatus(p, to) {
   if (!p || p.status === to) return;
-  p.status = to;
+  placeProduct(p, to, { index: 0 });
   if (to === 'live' && !p.liveAt) p.liveAt = today();
   if (to === 'stopped') p.stoppedAt = today();
   p.updatedAt = Date.now();
@@ -1219,13 +1300,36 @@ const actions = {
     } else location.hash = '#/p/' + el.dataset.id;
   },
   'add-product'() {
-    const p = { id: uid(), name: '', status: 'pipeline', createdAt: today(), updatedAt: Date.now(), listingLink: '', listingPrice: null, sellingPrice: null, image: '', notes: '', pages: [], angles: [], calc: calcFrom(S.data.settings.defaults) };
+    const p = { id: uid(), name: '', status: 'pipeline', createdAt: today(), updatedAt: Date.now(), listingLink: '', listingPrice: null, sellingPrice: null, image: '', notes: '', dailyBudget: null, tags: [], pages: [], angles: [], calc: calcFrom(S.data.settings.defaults) };
     S.data.products.push(p);
+    placeProduct(p, 'pipeline', { index: 0 });
     markDirty('Add product');
     location.hash = '#/p/' + p.id;
     setTimeout(() => { const t = $('.title-in'); if (t) t.focus(); }, 60);
   },
   'move'(el) { setStatus(getP(el.dataset.id), el.dataset.to); render(); },
+  'reorder'(el) {
+    const p = getP(el.dataset.id); const col = colItems(p.status); const i = col.indexOf(p);
+    const d = el.dataset.dir; const j = d === 'top' ? 0 : i + Number(d);
+    if (j < 0 || j >= col.length || j === i) return;
+    placeProduct(p, p.status, { index: j });
+    markDirty(`Reorder ${p.status}`); render();
+  },
+  'toggle-tag'(el) {
+    const p = getP(el.dataset.id); const t = el.dataset.tag;
+    if (p.tags.includes(t)) p.tags = p.tags.filter(x => x !== t); else p.tags.push(t);
+    el.classList.toggle('on', p.tags.includes(t));
+    markDirty(`Update ${p.name || 'product'} tags`);
+  },
+  async 'del-tag'(el) {
+    const t = el.dataset.tag; const used = S.data.products.filter(p => p.tags.includes(t)).length;
+    const k = await choose(`Delete tag “${t}”?`, used ? `It will also be removed from ${used} product${used > 1 ? 's' : ''}.` : 'No products use it.', [{ k: 'no', label: 'Cancel' }, { k: 'yes', label: 'Delete tag', danger: true, primary: true }]);
+    if (k !== 'yes') return;
+    S.data.settings.tags = S.data.settings.tags.filter(x => x !== t);
+    S.data.products.forEach(p => { p.tags = p.tags.filter(x => x !== t); });
+    if (S.boardTag === t.toLowerCase()) S.boardTag = '';
+    markDirty(`Delete tag ${t}`); render();
+  },
   async 'del-product'(el) {
     const p = getP(el.dataset.id);
     const k = await choose('Delete product?', `“${p.name || 'Untitled'}” and all its angles will be removed. (You can still recover it from GitHub history after saving.)`, [{ k: 'no', label: 'Cancel' }, { k: 'yes', label: 'Delete', danger: true, primary: true }]);
@@ -1362,6 +1466,7 @@ document.addEventListener('input', e => {
   if (el.hasAttribute('data-rerender')) render(); else updateDerived();
 });
 document.addEventListener('change', e => {
+  if (e.target.id === 'boardTag') { S.boardTag = e.target.value; filterBoard(); return; }
   if (e.target.id === 'importFile') {
     const file = e.target.files[0]; if (!file) return;
     file.text().then(async txt => {
@@ -1373,6 +1478,20 @@ document.addEventListener('change', e => {
   }
 });
 document.addEventListener('submit', async e => {
+  const ta_ = e.target.closest('[data-tagadd]');
+  if (ta_) {
+    e.preventDefault();
+    const input = $('input', ta_); const t = input.value.trim().replace(/\s+/g, ' ').slice(0, 30);
+    if (!t) return;
+    const existing = S.data.settings.tags.find(x => x.toLowerCase() === t.toLowerCase()) || t;
+    if (!S.data.settings.tags.includes(existing)) S.data.settings.tags.push(existing);
+    const pid = ta_.dataset.tagadd;
+    if (pid) { const p = getP(pid); if (!p.tags.includes(existing)) p.tags.push(existing); markDirty(`Update ${p.name || 'product'} tags`); }
+    else markDirty(`Add tag ${existing}`);
+    render();
+    const ni = $(`[data-tagadd="${pid}"] input`); if (ni) ni.focus();
+    return;
+  }
   const qa = e.target.closest('[data-quickadd]');
   if (qa) {
     e.preventDefault();
@@ -1409,12 +1528,29 @@ document.addEventListener('dragstart', e => {
   const c = e.target.closest && e.target.closest('.pcard'); if (!c) return;
   e.dataTransfer.setData('text/plain', c.dataset.id); e.dataTransfer.effectAllowed = 'move'; c.classList.add('dragging');
 });
-document.addEventListener('dragend', e => { const c = e.target.closest && e.target.closest('.pcard'); if (c) c.classList.remove('dragging'); $$('.col.over').forEach(x => x.classList.remove('over')); });
-document.addEventListener('dragover', e => { const col = e.target.closest && e.target.closest('[data-drop]'); if (!col) return; e.preventDefault(); $$('.col.over').forEach(x => x !== col && x.classList.remove('over')); col.classList.add('over'); });
+function clearDropMarks() { $$('.col.over').forEach(x => x.classList.remove('over')); $$('.drop-before').forEach(x => x.classList.remove('drop-before')); $$('.drop-end').forEach(x => x.classList.remove('drop-end')); }
+function dropTarget(col, y) { // first visible card whose middle is below the cursor
+  return $$('.pcard:not(.dragging):not([hidden])', col).find(c => { const r = c.getBoundingClientRect(); return y < r.top + r.height / 2; }) || null;
+}
+document.addEventListener('dragend', e => { const c = e.target.closest && e.target.closest('.pcard'); if (c) c.classList.remove('dragging'); clearDropMarks(); });
+document.addEventListener('dragover', e => {
+  const col = e.target.closest && e.target.closest('[data-drop]'); if (!col) return;
+  e.preventDefault();
+  const before = dropTarget(col, e.clientY);
+  clearDropMarks(); col.classList.add('over');
+  if (before) before.classList.add('drop-before'); else $('.col-b', col).classList.add('drop-end');
+});
 document.addEventListener('drop', e => {
   const col = e.target.closest && e.target.closest('[data-drop]'); if (!col) return;
-  e.preventDefault(); const id = e.dataTransfer.getData('text/plain');
-  setStatus(getP(id), col.dataset.drop); render();
+  e.preventDefault();
+  const p = getP(e.dataTransfer.getData('text/plain')); if (!p) return;
+  const before = dropTarget(col, e.clientY);
+  const stage = col.dataset.drop, from = p.status;
+  if (from !== stage) { if (stage === 'live' && !p.liveAt) p.liveAt = today(); if (stage === 'stopped') p.stoppedAt = today(); }
+  placeProduct(p, stage, { beforeId: before ? before.dataset.id : null });
+  p.updatedAt = Date.now();
+  markDirty(from !== stage ? `Move ${p.name || 'product'} → ${stage}` : `Reorder ${stage}`);
+  clearDropMarks(); render();
 });
 document.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save(); }
@@ -1440,6 +1576,18 @@ $('#reloadBtn').addEventListener('click', async () => {
   }
   await loadRemote(); toast('Loaded latest from GitHub');
 });
+
+/* home-screen icon (PNG drawn at runtime so this stays a single file) */
+(function touchIcon() {
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 180; const x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, 180, 180); g.addColorStop(0, '#6366f1'); g.addColorStop(1, '#a855f7');
+    x.fillStyle = g; x.fillRect(0, 0, 180, 180);
+    x.fillStyle = '#fff'; x.font = '800 112px -apple-system, Segoe UI, Arial, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText('S', 90, 98);
+    const l = document.createElement('link'); l.rel = 'apple-touch-icon'; l.href = c.toDataURL('image/png'); document.head.appendChild(l);
+  } catch {}
+})();
 
 /* ---------------- boot ---------------- */
 (async function boot() {
