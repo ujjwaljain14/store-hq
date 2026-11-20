@@ -303,6 +303,66 @@ select.in.sel{width:auto;padding:6px 30px 6px 10px}
 @keyframes tin{from{opacity:0;transform:translateY(6px)}}
 .loading{padding:60px;text-align:center;color:var(--mute)}
 
+/* ---------- phone calculator ---------- */
+.mcalc{display:flex;flex-direction:column;gap:12px}
+.mhero{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;box-shadow:var(--sh)}
+.mh-head{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)}
+.mh-head .badge{font-size:12.5px;letter-spacing:0;text-transform:none;padding:3px 9px;border-radius:20px}
+.mh-val{font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1.15;margin-top:4px;font-variant-numeric:tabular-nums}
+.mh-sub{font-size:12.5px;color:var(--mute);margin-top:2px}
+.mbar{display:flex;height:10px;border-radius:6px;overflow:hidden;margin:14px 0 9px;gap:2px;background:var(--soft)}
+.mbar i{display:block;min-width:3px}
+.mlegend{display:flex;flex-wrap:wrap;gap:5px 12px;font-size:11.5px;color:var(--ink2)}
+.mlegend span{display:inline-flex;align-items:center;gap:5px}
+.mlegend span>i{width:8px;height:8px;border-radius:3px;flex:none}
+.mlegend b{font-weight:650;color:var(--mute)}
+.mh-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.mh-stats div+div{border-left:1px solid var(--line);padding-left:12px}
+.mh-stats span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);font-weight:700}
+.mh-stats b{font-size:15px;font-variant-numeric:tabular-nums}
+.mseg{display:flex;width:100%;border-radius:12px}
+.mseg label{flex:1}
+.mseg label span{justify-content:center;text-align:center;padding:9px 6px;font-size:13.5px;border-radius:9px}
+.mhint{margin:-4px 4px 0;font-size:12px}
+.mgroup{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--sh)}
+.mg-t{padding:13px 16px 3px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)}
+.mrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 12px 9px 16px;border-top:1px solid var(--line);margin:0}
+.mg-t+.mrow{border-top:0}
+.ml{font-weight:600;font-size:15px;line-height:1.25;min-width:0}
+.ml small{display:block;font-weight:500;font-size:12px;color:var(--mute)}
+.mi{display:flex;align-items:center;width:138px;flex:none;border:1px solid var(--line2);border-radius:12px;background:var(--soft);padding:0 10px;transition:border-color .12s,box-shadow .12s,background .12s}
+.mi:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft);background:var(--panel)}
+.mi i{font-style:normal;color:var(--mute);font-weight:650;font-size:15px}
+.mi .in{border:0!important;background:transparent;box-shadow:none!important;text-align:right;font-weight:650;padding:9px 4px;font-size:17px;min-width:0;width:100%}
+.mi input::-webkit-inner-spin-button,.mi input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.mi input[type=number]{-moz-appearance:textfield}
+.mrow select.in{width:auto;max-width:180px;font-size:15px;border-radius:12px;background-color:var(--soft)}
+.mact{width:100%;justify-content:center;padding:11px;border-radius:12px}
+.mbe{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mbe>div{border-radius:16px;padding:12px 14px;background:var(--good-soft)}
+.mbe>div.bad{background:var(--bad-soft)}
+.mbe span{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.mbe b{display:block;font-size:21px;font-weight:750;letter-spacing:-.02em;margin:2px 0;font-variant-numeric:tabular-nums}
+.mbe small{display:block;font-size:11.5px;color:var(--ink2);line-height:1.35}
+.mbe .ok b{color:var(--good)}.mbe .bad b{color:var(--bad)}
+.mbreak{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:0 16px;box-shadow:var(--sh)}
+.mbreak summary{padding:14px 0;font-weight:650;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.mbreak summary::-webkit-details-marker{display:none}
+.mbreak summary svg{width:18px;height:18px;color:var(--mute);transition:transform .15s}
+.mbreak[open] summary svg{transform:rotate(180deg)}
+.mbreak .pl{margin-bottom:12px}
+.mbreak .pl th,.mbreak .pl td{padding:8px 2px}
+.mstick{position:fixed;left:0;right:0;top:calc(var(--top) + env(safe-area-inset-top));z-index:25;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 16px;
+  background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+  font-size:13px;font-weight:600;transform:translateY(-110%);opacity:0;pointer-events:none;transition:transform .18s,opacity .18s}
+.mstick.show{transform:none;opacity:1}
+.mstick b{font-size:17px;font-variant-numeric:tabular-nums}
+.econ-link{display:flex;align-items:center;justify-content:space-between;gap:10px;color:inherit;margin-bottom:14px}
+.econ-link:hover{text-decoration:none}
+.econ-link .el-l span{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.econ-link .el-l b{font-size:22px;letter-spacing:-.02em}
+.econ-link .el-r{display:flex;align-items:center;gap:6px;color:var(--acc);font-weight:600;font-size:13px}
+
 /* ---------- responsive ---------- */
 .stagetabs,.fab,.mlogo{display:none}
 @media (max-width:1150px){.grid2{grid-template-columns:1fr}}
@@ -369,7 +429,8 @@ select.in.sel{width:auto;padding:6px 30px 6px 10px}
   .ph-row{gap:8px}
   .ph-row .seg{order:5;flex:1 1 100%;display:flex}
   .ph-row .seg button{flex:1;justify-content:center;padding:8px 6px}
-  .tabs a{flex:1;justify-content:center}
+  .tabs a{flex:1;justify-content:center;padding:10px 4px}
+  .tabs-right{display:none}
   .aitem{scroll-margin-top:70px}
   .tiles{grid-template-columns:1fr 1fr;gap:10px}
   .tile{padding:12px 13px}.tile b{font-size:20px}
@@ -1035,13 +1096,9 @@ function calcBlock(scope, c, p) {
     <div class="calc-out" data-derived="calc|${scope}">${calcOut(scope)}</div>
   </div>`;
 }
-function calcOut(scope) {
-  const c = resolve(scope); if (!c) return '';
-  const p = scope.startsWith('calc:') ? getP(scope.split(':')[1]) : null;
-  const m = calcModel(c, p);
+function plTable(m) {
   const row = (l, v, sub = '', cls = '') => `<tr class="${cls}"><th>${l}</th><td>${v}</td><td class="sub">${sub}</td></tr>`;
   const dp = Number.isInteger(Math.round(m.d * 1000) / 10) ? 0 : 1;
-  const beDel = !isFinite(m.beDel) ? '—' : m.beDel > 1 ? '>100%' : pct(m.beDel, 1);
   return `<table class="pl">
     ${row('Product price (AOV)', inr(m.aov))}
     ${row('Total orders', n0(m.orders))}
@@ -1056,7 +1113,12 @@ function calcOut(scope) {
     ${m.self ? row('Shipping cost', inr(m.shipping), inr(m.shipU) + (m.shipAll ? ' / order' : ' / delivered'), 'cost') : row('Shipping cost', inr(0), 'in RTO charge')}
     ${row('RTO cost', inr(m.rtoCost), inr(m.rtoU) + ' / order', 'cost')}
     ${row('Packaging cost', inr(m.packaging), inr(m.packU) + ' / order', 'cost')}
-  </table>
+  </table>`;
+}
+function calcOut(scope) {
+  const { m } = calcCtx(scope); if (!m) return '';
+  const beDel = !isFinite(m.beDel) ? '—' : m.beDel > 1 ? '>100%' : pct(m.beDel, 1);
+  return `${plTable(m)}
   <div class="np ${pn(m.net)}"><span>Net profit</span><strong>${inr(m.net)}</strong></div>
   <div class="kpis">
     <div title="Net profit ÷ ad spend"><span>ROI</span><b>${pct(m.roi)}</b></div>
@@ -1067,6 +1129,89 @@ function calcOut(scope) {
     <div title="Net profit ÷ delivered revenue"><span>Net margin</span><b>${pct(m.margin, 1)}</b></div>
   </div>`;
 }
+
+/* ---------- phone calculator ---------- */
+const mq = window.matchMedia('(max-width: 860px)');
+const isPhone = () => mq.matches;
+function calcCtx(scope) {
+  const c = resolve(scope); if (!c) return {};
+  const p = scope.startsWith('calc:') ? getP(scope.split(':')[1]) : null;
+  return { c, p, m: calcModel(c, p) };
+}
+function mRow(scope, c, key, label, sub, { pre = '', post = '', ph = '' } = {}) {
+  return `<label class="mrow"><span class="ml">${label}${sub ? `<small>${sub}</small>` : ''}</span>
+    <span class="mi">${pre ? `<i>${pre}</i>` : ''}${inp(scope, key, c[key], { type: 'num', ph: String(ph) })}${post ? `<i>${post}</i>` : ''}</span></label>`;
+}
+function calcBlockMobile(scope, c, p) {
+  const self = c.mode === 'self';
+  return `<div class="mcalc">
+    <div class="mhero" data-derived="mhero|${scope}">${mHero(scope)}</div>
+    <div class="mstick" data-derived="mstick|${scope}">${mStick(scope)}</div>
+    <div class="seg mseg" role="radiogroup">
+      <label><input type="radio" name="mode-${scope}" value="aggregator" data-scope="${scope}" data-key="mode" data-rerender ${!self ? 'checked' : ''}><span>Aggregator</span></label>
+      <label><input type="radio" name="mode-${scope}" value="self" data-scope="${scope}" data-key="mode" data-rerender ${self ? 'checked' : ''}><span>Self-ship / Pvt</span></label>
+    </div>
+    <p class="hint mhint">${self ? 'You pay forward shipping. RTO = extra return charge per RTO order.' : 'Fixed RTO charge already includes shipping.'}</p>
+    <div class="mgroup">
+      <div class="mg-t">Price &amp; volume</div>
+      ${mRow(scope, c, 'aov', 'Selling price', p ? 'AOV · blank = selling price' : 'AOV', { pre: '₹', ph: p ? (num(p.sellingPrice) || '') : '' })}
+      ${mRow(scope, c, 'orders', 'Total orders', 'projected or actual', { ph: '0' })}
+      ${mRow(scope, c, 'cac', 'CAC', 'ad cost per order', { pre: '₹', ph: '0' })}
+      ${mRow(scope, c, 'deliveryPct', 'Delivery rate', 'share of orders delivered', { post: '%', ph: '0' })}
+    </div>
+    <div class="mgroup">
+      <div class="mg-t">Costs</div>
+      ${mRow(scope, c, 'cogs', 'Product cost', p ? 'COGS / unit · blank = listing price' : 'COGS per unit', { pre: '₹', ph: p ? (num(p.listingPrice) || '') : '' })}
+      ${mRow(scope, c, 'rto', 'RTO charge', self ? 'per returned order' : 'per RTO, incl. shipping', { pre: '₹', ph: '0' })}
+      ${self ? mRow(scope, c, 'shipping', 'Shipping', 'forward, per order', { pre: '₹', ph: '0' }) : ''}
+      ${self ? `<label class="mrow"><span class="ml">Charge shipping on</span><select class="in" data-scope="${scope}" data-key="shippingBasis">
+          <option value="all" ${c.shippingBasis !== 'delivered' ? 'selected' : ''}>All orders</option>
+          <option value="delivered" ${c.shippingBasis === 'delivered' ? 'selected' : ''}>Delivered only</option></select></label>` : ''}
+      ${mRow(scope, c, 'packaging', 'Packaging', 'per order', { pre: '₹', ph: '0' })}
+    </div>
+    ${p ? `<button class="btn mact" data-act="use-actuals" data-id="${p.id}">Use real orders &amp; CAC from angles</button>` : ''}
+    <div data-derived="mbe|${scope}">${mBreakEven(scope)}</div>
+    <details class="mbreak"><summary>Full P&amp;L breakdown ${I.chev}</summary><div data-derived="mtable|${scope}">${mTable(scope)}</div></details>
+  </div>`;
+}
+function costSegs(m) {
+  const segs = [['Ads', m.adSpend, '#6366f1'], ['COGS', m.cogs, '#f59e0b'], ['RTO', m.rtoCost, '#ef4444'], ['Shipping', m.shipping, '#0ea5e9'], ['Packaging', m.packaging, '#94a3b8']];
+  if (m.net > 0) segs.push(['Profit', m.net, '#10b981']);
+  return segs.filter(x => x[1] > 0);
+}
+function mHero(scope) {
+  const { m } = calcCtx(scope); if (!m) return '';
+  const segs = costSegs(m);
+  const base = m.deliveredRevenue || 1;
+  return `<div class="mh-head"><span>Net profit</span><span class="badge ${isFinite(m.roi) ? pn(m.roi) : ''}">ROI ${pct(m.roi, 1)}</span></div>
+    <div class="mh-val ${pn(m.net)}">${inr(m.net)}</div>
+    <div class="mh-sub">${inr(m.deliveredRevenue)} delivered of ${inr(m.revenue)} booked</div>
+    ${segs.length ? `<div class="mbar">${segs.map(([l, v, c]) => `<i style="flex:${v};background:${c}" title="${l}"></i>`).join('')}</div>
+    <div class="mlegend">${segs.map(([l, v, c]) => `<span><i style="background:${c}"></i>${l} <b>${pct(v / base, 0)}</b></span>`).join('')}</div>` : ''}
+    ${m.net < 0 && m.deliveredRevenue > 0 ? `<div class="mh-sub negv" style="margin-top:6px">Costs are ${pct(-m.net / base, 0)} more than delivered revenue</div>` : ''}
+    <div class="mh-stats">
+      <div><span>Before ads</span><b>${inr(m.beforeAds)}</b></div>
+      <div><span>Per order</span><b class="${pn(m.netPerOrder)}">${inr(m.netPerOrder)}</b></div>
+      <div><span>Margin</span><b>${pct(m.margin, 1)}</b></div>
+    </div>`;
+}
+function mStick(scope) {
+  const { m } = calcCtx(scope); if (!m) return '';
+  return `<span class="mute">Net profit</span><b class="${pn(m.net)}">${inr(m.net)}</b><span class="badge ${isFinite(m.roi) ? pn(m.roi) : ''}">ROI ${pct(m.roi, 1)}</span>`;
+}
+function mBreakEven(scope) {
+  const { m } = calcCtx(scope); if (!m) return '';
+  const cacGap = m.beCac - m.cac;
+  const delGap = (m.d - m.beDel) * 100;
+  const beDel = !isFinite(m.beDel) ? '—' : m.beDel > 1 ? '>100%' : pct(m.beDel, 1);
+  return `<div class="mbe">
+    <div class="${!isFinite(cacGap) || cacGap >= 0 ? 'ok' : 'bad'}"><span>Break-even CAC</span><b>${inr(m.beCac)}</b>
+      <small>${isFinite(cacGap) ? (cacGap >= 0 ? `${inr(cacGap)} headroom at your ${inr(m.cac)} CAC` : `${inr(-cacGap)} over at your ${inr(m.cac)} CAC`) : 'Add orders to calculate'}</small></div>
+    <div class="${!isFinite(delGap) || delGap >= 0 ? 'ok' : 'bad'}"><span>Break-even delivery</span><b>${beDel}</b>
+      <small>${isFinite(delGap) ? (delGap >= 0 ? `${delGap.toFixed(1)} pts cushion at ${pct(m.d, 0)}` : `${(-delGap).toFixed(1)} pts short at ${pct(m.d, 0)}`) : '—'}</small></div>
+  </div>`;
+}
+function mTable(scope) { const { m } = calcCtx(scope); return m ? plTable(m) : ''; }
 
 /* ---------- angles ---------- */
 function angleStatsLine(p, a) {
@@ -1164,6 +1309,7 @@ function tabAngles(p) {
   return `${angleSummary(p)}
   ${p.angles.length ? `<div class="afilter">
       ${['All', ...ANGLE_STATUS].filter(s => s === 'All' || counts[s]).map(s => `<button class="chip ${f === s ? 'on' : ''}" data-act="filter-angles" data-f="${s}">${s} ${s === 'All' ? p.angles.length : counts[s]}</button>`).join('')}
+      ${isPhone() ? `<span style="flex:1"></span><button class="iconbtn" title="Expand all" data-act="expand-all" data-id="${p.id}">${I.expand}</button><button class="iconbtn" title="Collapse all" data-act="collapse-all">${I.collapse}</button>` : ''}
     </div>` : ''}
   <div class="alist">
     ${list.map(({ a, i }) => angleItem(p, a, i)).join('') || (p.angles.length ? `<div class="empty">No ${esc(f)} angles.</div>` : `<div class="empty"><b>No angles yet</b>Each angle gets a title, ideation, and hook / body / CTA.<br><button class="btn primary" data-act="add-angle" data-id="${p.id}">${I.plus}New angle</button></div>`)}
@@ -1186,6 +1332,9 @@ function tabOverview(p) {
       <div><span>Est. profit</span><b class="${pn(st.net)}">${inr(st.net)}</b></div>
       <div><span>ROI</span><b class="${pn(st.roi)}">${pct(st.roi, 1)}</b></div>
     </div>` : ''}
+  ${isPhone() ? (() => { const m = calcModel(p.calc, p); return `<a class="card econ-link" href="#/p/${p.id}/economics">
+      <div class="el-l"><span>${p.status === 'pipeline' ? 'Projected net profit' : 'Net profit (calculator)'}</span><b class="${pn(m.net)}">${inr(m.net)}</b> <span class="badge ${isFinite(m.roi) ? pn(m.roi) : ''}" style="display:inline-block;text-transform:none;letter-spacing:0">ROI ${pct(m.roi, 1)}</span></div>
+      <div class="el-r">Economics ${I.chev.replace('<svg', '<svg style="transform:rotate(-90deg);width:16px;height:16px"')}</div></a>`; })() : ''}
   <div class="grid2">
     <section class="card">
       <h3>Product details</h3>
@@ -1212,10 +1361,10 @@ function tabOverview(p) {
       ${fld('Notes', ta(sc, 'notes', p.notes, 'Supplier, competitors, research, offer ideas…', 3))}
       ${p.status === 'stopped' ? fld('Why stopped?', ta(sc, 'stopReason', p.stopReason, 'High RTO, CAC too high, supplier issue…', 2)) : ''}
     </section>
-    <section class="card">
+    ${isPhone() ? '' : `<section class="card">
       <h3>Unit economics</h3>
       ${calcBlock('calc:' + p.id, p.calc, p)}
-    </section>
+    </section>`}
   </div>`;
 }
 
@@ -1223,7 +1372,9 @@ function viewProduct(id, tab) {
   const p = getP(id);
   if (!p) return `<div class="empty"><b>Product not found</b><a href="#/board">Back to products</a></div>`;
   const img = safeUrl(p.image);
-  const isAngles = tab === 'angles';
+  const phone = isPhone();
+  const cur = tab === 'angles' ? 'angles' : (tab === 'economics' && phone) ? 'economics' : 'overview';
+  const isAngles = cur === 'angles';
   return `
   <div class="phead">
     <div class="ph-row">
@@ -1238,7 +1389,8 @@ function viewProduct(id, tab) {
       <button class="iconbtn del" title="Delete product" data-act="del-product" data-id="${p.id}">${I.trash}</button>
     </div>
     <div class="tabs">
-      <a href="#/p/${p.id}" class="${!isAngles ? 'on' : ''}">Overview</a>
+      <a href="#/p/${p.id}" class="${cur === 'overview' ? 'on' : ''}">Overview</a>
+      ${phone ? `<a href="#/p/${p.id}/economics" class="${cur === 'economics' ? 'on' : ''}">Economics</a>` : ''}
       <a href="#/p/${p.id}/angles" class="${isAngles ? 'on' : ''}"><span class="hide-sm">Marketing&nbsp;</span>Angles<span class="count">${p.angles.length}</span></a>
       <div class="tabs-right">${isAngles ? `
         ${p.angles.length ? `<button class="btn ghost sm" data-act="expand-all" data-id="${p.id}" title="Open all">${I.expand}<span>Expand all</span></button>
@@ -1249,15 +1401,15 @@ function viewProduct(id, tab) {
     </div>
   </div>
   ${banner()}
-  ${isAngles ? tabAngles(p) : tabOverview(p)}`;
+  ${cur === 'angles' ? tabAngles(p) : cur === 'economics' ? calcBlockMobile('calc:' + p.id, p.calc, p) : tabOverview(p)}`;
 }
 
 function viewCalc() {
   return `<section class="card">
     <div class="card-h"><h3>Quick calculator</h3><button class="btn sm" data-act="reset-scratch">Reset to example</button></div>
-    <p class="hint">A scratchpad for quick what-ifs, saved with your data. Every product also has its own calculator on its Overview tab.</p>
-    ${calcBlock('scratch', S.data.scratch, null)}
-  </section>`;
+    <p class="hint">A scratchpad for quick what-ifs, saved with your data. Every product also has its own calculator on its page.</p>
+    ${isPhone() ? '' : calcBlock('scratch', S.data.scratch, null)}
+  </section>${isPhone() ? calcBlockMobile('scratch', S.data.scratch, null) : ''}`;
 }
 
 function viewSettings() {
@@ -1380,12 +1532,22 @@ function render() {
   renderSide();
   $$('textarea.grow', view).forEach(autoGrow);
   labelTables(view);
+  if (S.io) { S.io.disconnect(); S.io = null; }
+  const hero = $('.mhero', view), strip = $('.mstick', view);
+  if (hero && strip && 'IntersectionObserver' in window) {
+    S.io = new IntersectionObserver(([en]) => strip.classList.toggle('show', !en.isIntersecting && en.boundingClientRect.top < 80), { rootMargin: '-60px 0px 0px 0px' });
+    S.io.observe(hero);
+  }
   if (r === 'board' && (S.boardQ || S.boardTag)) filterBoard();
 }
 function updateDerived() {
   $$('[data-derived]').forEach(el => {
     const [t, a, b] = el.dataset.derived.split('|');
     if (t === 'calc') el.innerHTML = calcOut(a);
+    else if (t === 'mhero') el.innerHTML = mHero(a);
+    else if (t === 'mstick') el.innerHTML = mStick(a);
+    else if (t === 'mbe') el.innerHTML = mBreakEven(a);
+    else if (t === 'mtable') el.innerHTML = mTable(a);
     else if (t === 'angletot') { const p = getP(a); const an = p && p.angles.find(x => x.id === b); if (an) el.innerHTML = angleTotals(p, an); }
   });
 }
@@ -1704,6 +1866,8 @@ $('#reloadBtn').addEventListener('click', async () => {
   }
   await loadRemote(); toast('Loaded latest from GitHub');
 });
+
+(mq.addEventListener ? mq.addEventListener('change', () => S.data && render()) : mq.addListener(() => S.data && render()));
 
 /* home-screen icon (PNG drawn at runtime so this stays a single file) */
 (function touchIcon() {
